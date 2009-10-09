@@ -7,15 +7,16 @@ my $build = Module::Build->new(
                dist_author => 'Jens Rehsack <rehsack@cpan.org>, Alexander Breibach <alexander.breibach@googlemail.com>',
                license     => 'perl',
                requires    => {
-                             'SQL::Statement'      => '1.20',
-                             'Module::Pluggable'   => '3.9',
-                             'DBI'                 => '1.41',
-                             'Params::Util'        => '1.00',
+                             'SQL::Statement'    => '1.20',
+                             'Module::Pluggable' => '3.9',
+                             'DBI'               => '1.41',
+                             'Params::Util'      => '1.00',
                            },
-               recommends         => {
-                             'Sys::Filesystem'     => '1.00',
-                             'Filesys::DfPortable' => '0.83',
-		       },
+               recommends => {
+                               'Sys::Filesystem'     => '1.00',
+                               'Filesys::DfPortable' => '0.83',
+                               'Proc::ProcessTable'  => '0.45',
+                             },
                create_makefile_pl => 'traditional',
 );
 $build->create_build_script;
