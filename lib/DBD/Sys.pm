@@ -396,6 +396,8 @@ sub rows ($)
 package DBD::Sys::Statement;
 
 use base qw(SQL::Statement);
+use Carp qw(croak);
+
 use Module::Pluggable
   require     => 1,
   search_path => ['DBD::Sys::Plugin'],
@@ -423,10 +425,11 @@ sub open_table($$$$$)
     $self->initTables2Classes() unless ( _HASH( \%tables2classes ) );
 
     my $tblClass = $tables2classes{ lc $table };
-    return $self->do_err("Specified table '$table' not known") unless ($tblClass);
+    croak("Specified table '$table' not known") unless ($tblClass);
 
-    my $tbl = eval { $tblClass->new() };
-    return $self->do_err($@) if ($@);
+    my $tbl = $tblClass->new();
+
+    # return $self->do_err($@) if ($@);
 
     $tbl;
 }
