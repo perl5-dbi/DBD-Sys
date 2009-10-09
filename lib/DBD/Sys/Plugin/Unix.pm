@@ -255,7 +255,14 @@ preferred freelancer agencies.
 my %supportedTables = (
                         pwent => 'DBD::Sys::Plugin::Unix::PwEnt',
                         grent => 'DBD::Sys::Plugin::Unix::GrEnt',
-                        procs => 'DBD::Sys::Plugin::Unix::Procs');
+                      );
+
+my $haveProcProcessTable = 0;
+eval {
+    require Proc::ProcessTable;
+    $haveProcProcessTable = 1;
+    $supportedTables{procs} = 'DBD::Sys::Plugin::Unix::Procs';
+};
 
 sub getSupportedTables() { %supportedTables }
 
@@ -318,18 +325,18 @@ use warnings;
 use vars qw(@colNames);
 
 use base qw(DBD::Sys::Table);
-use Proc::ProcessTable;
 
-@colNames = qw(uid gid euid egid pid ppid pgrp sess priority ttynum flags time ctime size rss wchan fname start pctcpu state pctmem cmndline ttydev);
+@colNames =
+  qw(uid gid euid egid pid ppid pgrp sess priority ttynum flags time ctime size rss wchan fname start pctcpu state pctmem cmndline ttydev);
 
 sub getColNames() { @colNames }
 
 sub collect_data()
 {
     my @data;
-    my $pt = new Proc::ProcessTable;
+    my $pt = Proc::ProcessTable->new();
 
-    foreach my $proc ( @{$pt->table} )
+    foreach my $proc ( @{ $pt->table } )
     {
         my @row;
 
@@ -341,4 +348,4 @@ sub collect_data()
     \@data;
 }
 
-1;                 # every module must end like this
+1;    # every module must end like this

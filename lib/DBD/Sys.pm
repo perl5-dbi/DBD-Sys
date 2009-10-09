@@ -429,8 +429,6 @@ sub open_table($$$$$)
 
     my $tbl = $tblClass->new();
 
-    # return $self->do_err($@) if ($@);
-
     $tbl;
 }
 

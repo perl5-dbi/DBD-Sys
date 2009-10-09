@@ -3,11 +3,12 @@
 use Test::More tests => 13;
 
 use DBI;
+use Data::Dumper;
 
 my $username = getpwuid($<);
 my $groupname = getgrgid($();
 
-ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect pwent');
+ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect');
 ok( $st  = $dbh->prepare( 'SELECT DISTINCT username, uid FROM pwent WHERE uid=?' ), 'prepare pwent' );
 ok( $num = $st->execute($<), 'execute pwent' );
 while( $row = $st->fetchrow_hashref() )
@@ -24,8 +25,8 @@ while( $row = $st->fetchrow_hashref() )
     cmp_ok( $groupname, 'eq', $row->{groupname}, 'groupname grent' );
 }
 
-ok( $st  = $dbh->prepare( 'SELECT DISTINCT grent.groupname, grent.gid FROM grent, pwent WHERE grent.gid=? and pwent.gid=grent.gid' ), 'prepare join' );
-ok( $num = $st->execute(0+$(), 'execute join' );
+ok( $st  = $dbh->prepare( "SELECT DISTINCT grent.groupname, grent.gid FROM grent, pwent WHERE pwent.uid=? and pwent.gid=grent.gid" ), 'prepare join' );
+ok( $num = $st->execute($<), 'execute join' );
 while( $row = $st->fetchrow_hashref() )
 {
     cmp_ok( $(, '==', $row->{'grent.gid'}, 'gid join' );

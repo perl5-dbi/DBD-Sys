@@ -166,10 +166,20 @@ preferred freelancer agencies.
 
 #################### main pod documentation end ###################
 
-my %supportedTables = (
-                        filesystems => 'DBD::Sys::Plugin::Any::FileSys',
-                        filesysdf   => 'DBD::Sys::Plugin::Any::FileSysDf',
-                      );
+my $haveSysFilesystem     = 0;
+my $haveFilesysDfPortable = 0;
+my %supportedTables       = ();
+
+eval {
+    require Sys::Filesystem;
+    $haveSysFilesystem = 1;
+    $supportedTables{filesystems} = 'DBD::Sys::Plugin::Any::FileSys';
+};
+eval {
+    require Filesys::DfPortable;
+    $haveFilesysDfPortable = 1;
+    $supportedTables{filesysdf} = 'DBD::Sys::Plugin::Any::FileSysDf';
+} if ($haveSysFilesystem);
 
 sub getSupportedTables() { %supportedTables }
 
@@ -178,7 +188,6 @@ package DBD::Sys::Plugin::Any::FileSys;
 use vars qw(@colNames);
 
 use base qw(DBD::Sys::Table);
-use Sys::Filesystem;
 
 @colNames = qw(mountpoint mounted label volume device special type options);
 
@@ -188,7 +197,7 @@ sub collect_data()
 {
     my @data;
 
-    my $fs          = new Sys::Filesystem;
+    my $fs          = Sys::Filesystem->new();
     my @filesystems = $fs->filesystems();
 
     foreach my $filesys (@filesystems)
@@ -211,8 +220,7 @@ package DBD::Sys::Plugin::Any::FileSysDf;
 use vars qw(@colNames);
 
 use base qw(DBD::Sys::Table);
-use Sys::Filesystem;
-use Filesys::DfPortable;
+if ($haveFilesysDfPortable) { import Filesys::DfPortable; }
 
 @colNames = qw(mountpoint blocks bfree bavail bused bper files ffree favail fused fper);
 
@@ -222,7 +230,7 @@ sub collect_data()
 {
     my @data;
 
-    my $fs = new Sys::Filesystem;
+    my $fs = Sys::Filesystem->new();
     my @filesystems = $fs->filesystems( mounted => 1 );
 
     foreach my $filesys (@filesystems)
