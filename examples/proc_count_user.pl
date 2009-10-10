@@ -34,6 +34,6 @@ if ( GetOptions(%options) )    # "=" means required, "i" means integer
     my $table = Text::TabularDisplay->new( qw(Username Processes));
     $table->add(@row)
         while (@row = $st->fetchrow);
-    print "\n" . $table->render . "\n\n";
+    print $table->render . "\n";
 
 }    # GetOpt succeed, else failed
