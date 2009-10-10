@@ -419,6 +419,12 @@ sub initTables2Classes()
     $self;
 }
 
+sub getTableList()
+{
+    $_[0]->initTables2Classes() unless ( _HASH( \%tables2classes ) );
+    keys %tables2classes;
+}
+
 sub open_table($$$$$)
 {
     my ( $self, $data, $table, $createMode, $lockMode ) = @_;
@@ -427,7 +433,7 @@ sub open_table($$$$$)
     my $tblClass = $tables2classes{ lc $table };
     croak("Specified table '$table' not known") unless ($tblClass);
 
-    my $tbl = $tblClass->new();
+    my $tbl = $tblClass->new($self);
 
     $tbl;
 }

@@ -5,22 +5,27 @@ use warnings;
 use vars qw(@ISA);
 
 require SQL::Eval;
+use Scalar::Util qw(weaken);
 
 @ISA = qw(SQL::Eval::Table);
 
 sub new
 {
     my $className = $_[0];
+    my $owner     = $_[1];
     my %table = (
                   col_names => [ $className->getColNames() ],
                   col_nums  => {},
                   pos       => 0,
+                  owner     => $owner,
                 );
 
     my $i = 0;
     %{ $table{col_nums} } = map { $_ => $i++ } @{ $table{col_names} };
 
     my $self = $className->SUPER::new( \%table );
+
+    weaken( $self->{owner} );
 
     $self->{data} = $self->collect_data();
 
@@ -61,8 +66,8 @@ of SQL::Statement on a table around the pure data collecting actions.
 =item new
 
 Constructor - called from C<DBD::Sys::Statement::open_table> when called
-from C<SQL::Statement::opentables>. The constructor is always invoked without
-parameters.
+from C<SQL::Statement::opentables>. The constructor is always invoked with
+the owning statement instance as first argument.
 
 =item fetch_row
 

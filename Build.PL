@@ -7,10 +7,11 @@ my $build = Module::Build->new(
                dist_author => 'Jens Rehsack <rehsack@cpan.org>, Alexander Breibach <alexander.breibach@googlemail.com>',
                license     => 'perl',
                requires    => {
-                             'SQL::Statement'    => '1.20',
-                             'Module::Pluggable' => '3.9',
                              'DBI'               => '1.41',
+                             'Module::Pluggable' => '3.9',
                              'Params::Util'      => '1.00',
+                             'Scalar::Util'      => '1.00',
+                             'SQL::Statement'    => '1.20',
                            },
                recommends => {
                                'Sys::Filesystem'     => '1.00',
