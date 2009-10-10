@@ -21,78 +21,83 @@
   </calendars>
   <tasks>
     <task id="1" name="DBD::Sys::Plugin::Any::FileSysDf Parametrisieren (block sizes)" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-    <task id="2" name="Meta Data of DBD::Sys + Table of Tables ..." note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-    <task id="3" name="DBD::Sys::Plugin::Unix::NetInterfaces" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-    <task id="4" name="DBD::Sys::Plugin::Unix::Procs" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
-      <task id="5" name="Proc::ProcessTable" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+    <task id="2" name="DBD::Sys::Plugin::Unix::Procs - only if Proc::ProcessTable available (+tests)" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+    <task id="3" name="DBD::Sys::Plugin::Meta (provide list of tables etc.)" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <task id="4" name="Meta Data of DBD::Sys + Table of Tables ..." note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
     </task>
-    <task id="6" name="DBD::Sys::Plugin::Any::OpenFiles" note="" work="57600" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
-      <task id="7" name="Util::Lsof" note="" work="57600" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
-        <task id="8" name="IPC::Command" note="" work="57600" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
-          <task id="9" name="Task::Manager" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-          <task id="10" name="IO::Manager" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+    <task id="5" name="DBD::Sys::Plugin::Unix::NetInterfaces" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+    <task id="6" name="DBD::Sys::Plugin::Unix::Procs" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <task id="7" name="Proc::ProcessTable" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+    </task>
+    <task id="8" name="DBD::Sys::Plugin::Any::OpenFiles" note="" work="57600" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <task id="9" name="Util::Lsof" note="" work="57600" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="10" name="IPC::Command" note="" work="57600" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <task id="11" name="Task::Manager" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+          <task id="12" name="IO::Manager" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
         </task>
       </task>
     </task>
-    <task id="11" name="DBD::Sys::Plugin::Any::OpenFiles parametrisieren (mounts)" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-    <task id="12" name="DBD::Sys::Plugin::Win32" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-    <task id="13" name="Extra-Plugins (separate Module)" note="" work="172800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
-      <task id="14" name="DBD::Sys::Plugin::MySQL" note="" work="57600" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
-        <task id="15" name="MySQL installieren, Tabellen anlegen + Rollen + Berechtigungen" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-        <task id="16" name="Tabelle in D:S:P:M f&#xFC;r Benutzer, Rollen, Backup-Zeiten, ..." note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+    <task id="13" name="DBD::Sys::Plugin::Any::OpenFiles parametrisieren (mounts)" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+    <task id="14" name="DBD::Sys::Plugin::Win32" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+    <task id="15" name="Extra-Plugins (separate Module)" note="" work="172800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <task id="16" name="DBD::Sys::Plugin::MySQL" note="" work="57600" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="17" name="MySQL installieren, Tabellen anlegen + Rollen + Berechtigungen" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+        <task id="18" name="Tabelle in D:S:P:M f&#xFC;r Benutzer, Rollen, Backup-Zeiten, ..." note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
       </task>
-      <task id="17" name="DBD:Sys::Plugin::Pg" note="" work="57600" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
-        <task id="18" name="PostgreSQL installieren, Tabellen, Benutzer, Rollen ..." note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-        <task id="19" name="Tabelle in D:S:P:P f&#xFC;r Benutzer, Rollen, Backup-Zeiten, ..." note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+      <task id="19" name="DBD:Sys::Plugin::Pg" note="" work="57600" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="20" name="PostgreSQL installieren, Tabellen, Benutzer, Rollen ..." note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+        <task id="21" name="Tabelle in D:S:P:P f&#xFC;r Benutzer, Rollen, Backup-Zeiten, ..." note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
       </task>
-      <task id="20" name="DBD::Sys::Plugin::Oracle" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-      <task id="21" name="DBD::Sys::Plugin::SAP" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+      <task id="22" name="DBD::Sys::Plugin::Oracle" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+      <task id="23" name="DBD::Sys::Plugin::SAP" note="" work="28800" start="20091008T000000Z" end="20091008T170000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
     </task>
-    <task id="22" name="Reporter" note="" work="115200" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
-      <task id="23" name="YAML Dateien f&#xFC;r Report-Daten" note="" work="28800" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-      <task id="24" name="LaTeX Templates f&#xFC;r Report (Druckversion)" note="" work="28800" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-      <task id="25" name="CSV-Templatef&#xFC;r Report (Archiv-Version)" note="" work="28800" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-      <task id="26" name="DBI/PostgreSQL Template f&#xFC;r Daten (DB-Archiv)" note="" work="28800" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
-        <task id="27" name="Catalyst-Anwendung f&#xFC;r Report-Abfragen" note="" work="28800" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+    <task id="24" name="Reporter" note="" work="115200" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <task id="25" name="YAML Dateien f&#xFC;r Report-Daten" note="" work="28800" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+      <task id="26" name="LaTeX Templates f&#xFC;r Report (Druckversion)" note="" work="28800" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+      <task id="27" name="CSV-Templatef&#xFC;r Report (Archiv-Version)" note="" work="28800" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+      <task id="28" name="DBI/PostgreSQL Template f&#xFC;r Daten (DB-Archiv)" note="" work="28800" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="29" name="Catalyst-Anwendung f&#xFC;r Report-Abfragen" note="" work="28800" start="20091008T000000Z" end="20091008T120000Z" work-start="20091008T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
       </task>
     </task>
   </tasks>
   <resource-groups/>
   <resources>
-    <resource id="1" name="Jens" short-name="" type="1" units="0" email="" note="" std-rate="0"/>
-    <resource id="2" name="Alex" short-name="" type="1" units="0" email="" note="" std-rate="0"/>
+    <resource id="1" name="Alex" short-name="" type="1" units="0" email="" note="" std-rate="0"/>
+    <resource id="2" name="Jens" short-name="" type="1" units="0" email="" note="" std-rate="0"/>
   </resources>
   <allocations>
-    <allocation task-id="12" resource-id="1" units="100"/>
-    <allocation task-id="22" resource-id="1" units="100"/>
+    <allocation task-id="2" resource-id="1" units="100"/>
+    <allocation task-id="5" resource-id="1" units="100"/>
+    <allocation task-id="24" resource-id="1" units="100"/>
+    <allocation task-id="17" resource-id="1" units="100"/>
+    <allocation task-id="18" resource-id="1" units="100"/>
+    <allocation task-id="20" resource-id="1" units="100"/>
+    <allocation task-id="21" resource-id="1" units="100"/>
+    <allocation task-id="13" resource-id="1" units="100"/>
+    <allocation task-id="29" resource-id="1" units="100"/>
+    <allocation task-id="28" resource-id="1" units="100"/>
     <allocation task-id="27" resource-id="1" units="100"/>
     <allocation task-id="26" resource-id="1" units="100"/>
     <allocation task-id="25" resource-id="1" units="100"/>
-    <allocation task-id="24" resource-id="1" units="100"/>
-    <allocation task-id="23" resource-id="1" units="100"/>
-    <allocation task-id="21" resource-id="1" units="100"/>
-    <allocation task-id="20" resource-id="1" units="100"/>
-    <allocation task-id="1" resource-id="1" units="100"/>
+    <allocation task-id="19" resource-id="1" units="100"/>
+    <allocation task-id="16" resource-id="1" units="100"/>
     <allocation task-id="8" resource-id="1" units="100"/>
-    <allocation task-id="9" resource-id="1" units="100"/>
-    <allocation task-id="10" resource-id="1" units="100"/>
-    <allocation task-id="7" resource-id="1" units="100"/>
-    <allocation task-id="5" resource-id="1" units="100"/>
+    <allocation task-id="6" resource-id="1" units="100"/>
     <allocation task-id="3" resource-id="2" units="100"/>
-    <allocation task-id="22" resource-id="2" units="100"/>
-    <allocation task-id="15" resource-id="2" units="100"/>
-    <allocation task-id="16" resource-id="2" units="100"/>
-    <allocation task-id="18" resource-id="2" units="100"/>
-    <allocation task-id="19" resource-id="2" units="100"/>
-    <allocation task-id="11" resource-id="2" units="100"/>
+    <allocation task-id="14" resource-id="2" units="100"/>
+    <allocation task-id="24" resource-id="2" units="100"/>
+    <allocation task-id="29" resource-id="2" units="100"/>
+    <allocation task-id="28" resource-id="2" units="100"/>
     <allocation task-id="27" resource-id="2" units="100"/>
     <allocation task-id="26" resource-id="2" units="100"/>
     <allocation task-id="25" resource-id="2" units="100"/>
-    <allocation task-id="24" resource-id="2" units="100"/>
     <allocation task-id="23" resource-id="2" units="100"/>
-    <allocation task-id="17" resource-id="2" units="100"/>
-    <allocation task-id="14" resource-id="2" units="100"/>
-    <allocation task-id="6" resource-id="2" units="100"/>
-    <allocation task-id="4" resource-id="2" units="100"/>
+    <allocation task-id="22" resource-id="2" units="100"/>
+    <allocation task-id="1" resource-id="2" units="100"/>
+    <allocation task-id="10" resource-id="2" units="100"/>
+    <allocation task-id="11" resource-id="2" units="100"/>
+    <allocation task-id="12" resource-id="2" units="100"/>
+    <allocation task-id="9" resource-id="2" units="100"/>
+    <allocation task-id="7" resource-id="2" units="100"/>
   </allocations>
 </project>
