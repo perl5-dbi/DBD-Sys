@@ -84,7 +84,7 @@ sub getColNames() { @colNames }
 
 sub collect_data()
 {
-    my @data = $_[0]->{owner}->getTableList();
+    my @data =map{[$_]}$self->{owner}->getTableList();
 
     \@data;
 }
