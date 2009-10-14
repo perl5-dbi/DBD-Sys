@@ -258,11 +258,12 @@ my %supportedTables = (
                       );
 
 my $haveProcProcessTable = 0;
+
 eval {
     require Proc::ProcessTable;
     $haveProcProcessTable = 1;
     $supportedTables{procs} = 'DBD::Sys::Plugin::Unix::Procs';
-};
+} if ($haveProcProcessTable);
 
 sub getSupportedTables() { %supportedTables }
 
@@ -325,6 +326,8 @@ use warnings;
 use vars qw(@colNames);
 
 use base qw(DBD::Sys::Table);
+
+if ($haveProcProcessTable) { import Proc::ProcessTable; }
 
 @colNames =
   qw(uid gid euid egid pid ppid pgrp sess priority ttynum flags time ctime size rss wchan fname start pctcpu state pctmem cmndline ttydev);
