@@ -228,15 +228,17 @@ sub getColNames() { @colNames }
 
 sub collect_data()
 {
+    my $self = $_[0];
     my @data;
 
     my $fs = Sys::Filesystem->new();
     my @filesystems = $fs->filesystems( mounted => 1 );
+    my $blocksize = $self->{attrs}->{blocksize} || 1;
 
     foreach my $filesys (@filesystems)
     {
         my @row;
-        my $df = dfportable( $fs->mount_point($filesys) );
+        my $df = dfportable( $fs->mount_point($filesys), $blocksize );
         if ( defined($df) )
         {
             @row = (

@@ -15,7 +15,7 @@ sub driver($;$)
 
     $drh->{$class} and return $drh->{$class};
 
-    DBI->setup_driver("DBD::Sys");    # only needed once but harmless to repeat
+    DBI->setup_driver('DBD::Sys');    # only needed once but harmless to repeat
     $attr ||= {};
     {
         no strict "refs";
@@ -48,24 +48,6 @@ sub connect
     # environment variables to be set; this could be where you
     # validate that they are set, or default them if they are not set.
 
-    my $driver_prefix = "sys_";    # the assigned prefix for this driver
-
-    # Process attributes from the DSN; we assume ODBC syntax
-    # here, that is, the DSN looks like var1=val1;...;varN=valN
-    #      foreach my $var ( split /;/, $dr_dsn ) {
-    #          my ($attr_name, $attr_value) = split '=', $var, 2;
-    #          return $drh->set_err($DBI::stderr, "Can't parse DSN part '$var'")
-    #              unless defined $attr_value;
-
-    # add driver prefix to attribute name if it doesn't have it already
-    #          $attr_name = $driver_prefix.$attr_name
-    #              unless $attr_name =~ /^$driver_prefix/o;
-
-    # Store attribute into %$attr, replacing any existing value.
-    # The DBI will STORE() these into $dbh after we've connected
-    #          $attr->{$attr_name} = $attr_value;
-    #      }
-
     # Get the attributes we'll use to connect.
     # We use delete here because these no need to STORE them
     #      my $db = delete $attr->{drv_database} || delete $attr->{drv_db}
@@ -83,6 +65,24 @@ sub connect
     $dbh->STORE( 'Active', 1 );
 
     #      $dbh->{drv_connection} = $connection;
+
+    my $driver_prefix = "sys_";    # the assigned prefix for this driver
+
+    # Process attributes from the DSN; we assume ODBC syntax
+    # here, that is, the DSN looks like var1=val1;...;varN=valN
+         foreach my $var ( split /;/, $dr_dsn ) {
+             my ($attr_name, $attr_value) = split( '=', $var, 2 );
+              return $drh->set_err($DBI::stderr, "Can't parse DSN part '$var'")
+                  unless defined $attr_value;
+
+    # add driver prefix to attribute name if it doesn't have it already
+              $attr_name = $driver_prefix.$attr_name
+                  unless $attr_name =~ /^$driver_prefix/o;
+
+    # Store attribute into %$attr, replacing any existing value.
+    # The DBI will STORE() these into $dbh after we've connected
+              $dbh->{$attr_name} = $attr_value;
+          }
 
     return $outer;
 }
@@ -124,7 +124,7 @@ sub prepare ($$;@)
         eval {
             my $parser = $dbh->{sql_parser_object};
             $parser ||= $dbh->func('cache_sql_parser_object');
-            $stmt = eval { $class->new( $statement, $parser ) };
+            $stmt = eval { $class->new( $statement, $parser, $dbh ) };
         };
 
         if ($@)
@@ -397,6 +397,7 @@ package DBD::Sys::Statement;
 
 use base qw(SQL::Statement);
 use Carp qw(croak);
+use Scalar::Util qw(weaken);
 
 use Module::Pluggable
   require     => 1,
@@ -405,6 +406,15 @@ use Module::Pluggable
 use Params::Util qw(_HASH);
 
 my %tables2classes;
+
+sub new($$)
+{
+    my ($class,$statement,$parser,$dbh) = @_;
+    my $self = $class->SUPER::new($statement,$parser);
+    $self->{dbh} = $dbh;
+    weaken($self->{dbh});
+    $self;
+}
 
 sub initTables2Classes()
 {
@@ -430,10 +440,17 @@ sub open_table($$$$$)
     my ( $self, $data, $table, $createMode, $lockMode ) = @_;
     $self->initTables2Classes() unless ( _HASH( \%tables2classes ) );
 
+    my $attr_prefix = 'sys_' . lc($table) . '_';
+    my $attrs = {};
+    foreach my $attr (keys %{$self->{dbh}})
+    {
+	next unless( $attr =~ m/^$attr_prefix(.+)$/ );
+        $attrs->{$1} = $self->{dbh}->{$attr};
+    }
     my $tblClass = $tables2classes{ lc $table };
     croak("Specified table '$table' not known") unless ($tblClass);
 
-    my $tbl = $tblClass->new($self);
+    my $tbl = $tblClass->new($self, $attrs);
 
     $tbl;
 }

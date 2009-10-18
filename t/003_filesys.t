@@ -12,7 +12,7 @@ eval { require Filesys::DfPortable; $haveFilesysDfPortable = 1; } if ($haveSysFi
 
 my $mountpt = '';
 
-ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect' );
+ok( my $dbh = DBI->connect('DBI:Sys:sys_filesysdf_blocksize=1024'), 'connect' );
 SKIP:
 {
     skip( 'Sys::Filesystem required for table filesystems', 3 ) unless ($haveSysFilesystem);
