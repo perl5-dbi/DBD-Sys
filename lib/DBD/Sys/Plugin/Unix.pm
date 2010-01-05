@@ -258,12 +258,19 @@ my %supportedTables = (
                       );
 
 my $haveProcProcessTable = 0;
+my $haveNetInterface     = 0;
 
 eval {
     require Proc::ProcessTable;
     $haveProcProcessTable = 1;
     $supportedTables{procs} = 'DBD::Sys::Plugin::Unix::Procs';
-} if ($haveProcProcessTable);
+};
+
+eval {
+    require Net::Interface;
+    $haveNetInterface = 1;
+    $supportedTables{netint} = 'DBD::Sys::Plugin::Unix::NetInterface';
+};
 
 sub getSupportedTables() { %supportedTables }
 
@@ -351,4 +358,103 @@ sub collect_data()
     \@data;
 }
 
+package DBD::Sys::Plugin::Unix::NetInterface;
+
+use strict;
+use warnings;
+use vars qw(@colNames);
+use vars qw(@ISA);
+use Net::Interface qw(
+  :afs
+  :iffs
+  :iftype
+  mac_bin2hex);
+use Socket qw(inet_ntoa);
+use Socket6 qw(inet_ntop);
+
+use base qw(DBD::Sys::Table);
+
+if ($haveNetInterface) { import Net::Interface; }
+
+@colNames = qw(interface address_family address netmask broadcast hwadress flags_bin flags mtu metric);
+
+sub getColNames() { @colNames }
+
+sub getflags($)
+{
+    my $flags = $_[0] // 0;
+    my $txt = ( $flags & IFF_UP ) ? '<up' : '<down';
+    foreach my $iffname ( sort @{ $Net::Interface::EXPORT_TAGS{iffs} } )
+    {
+        no strict;
+        my $v = eval { &$iffname() + 0; };
+        next if $v == IFF_UP;
+        if ( $flags & $v )
+        {
+            my $x = eval { &$iffname(); };
+            $txt .= ' ' . $x;
+        }
+        use strict;
+    }
+    $txt .= '>';
+}
+
+sub collect_data()
+{
+    my @data;
+    my @ifaces = interfaces Net::Interface();
+    my $num    = @ifaces;
+
+    print "\n$num Interfaces gefunden: @ifaces\n";
+
+    foreach my $hvp (@ifaces)
+    {
+        my $if    = $hvp->info();
+        my $flags = getflags( $if->{flags} );
+        unless ( defined $if->{flags} && $if->{flags} & IFF_UP() )    # no flags found
+        {
+            push( @data, [ $if->{name}, undef, undef, undef, undef, undef, $if->{flags}, $flags, undef, undef, ] );
+        }
+        else                                                          # flags found
+        {
+            my $mac    = ( defined $if->{mac} )    ? "\n\tMAC: " . mac_bin2hex( $if->{mac} ) : '';
+            my $mtu    = $if->{mtu}                ? 'MTU:' . $if->{mtu}                     : '';
+            my $metric = ( defined $if->{metric} ) ? 'Metric:' . $if->{metric}               : '';
+
+            foreach my $afname ( sort @{ $Net::Interface::EXPORT_TAGS{afs} } )
+            {
+                no strict;
+                my $af = eval { &$afname() + 0; };
+                use strict;
+
+                next unless ( defined($af) );
+
+                if ( exists( $if->{$af} ) )
+                {
+                    my @address   = $hvp->address($af);
+                    my @netmask   = $hvp->netmask($af);
+                    my @broadcast = $hvp->broadcast($af);
+
+                    foreach my $i ( 0 .. $#address )
+                    {
+                        my $addr_str  = inet_ntop( $af, $address[$i] );
+                        my $netm_str  = inet_ntop( $af, $netmask[$i] );
+                        my $broad_str = inet_ntop( $af, $broadcast[$i] ) if ( defined( $broadcast[$i] ) );
+
+                        push( @data,
+                                   [
+                                   $if->{name}, $afname,
+                                   $addr_str,
+                                   $netm_str,
+                                   $broad_str,
+                                   $mac, $if->{flags}, $flags, $if->{mtu}, $if->{metric},
+                                   ]
+                            );
+                    }
+                }
+            }
+        }
+    }
+    \@data;
+}
 1;    # every module must end like this
