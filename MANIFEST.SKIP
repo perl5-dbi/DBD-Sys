@@ -3,6 +3,7 @@
 \.orig$
 \.old$
 \.tdy$
+\.tmp$
 \..*swp
 ^Makefile$
 ^Build$
