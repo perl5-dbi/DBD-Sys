@@ -334,24 +334,37 @@ use vars qw(@colNames);
 
 use base qw(DBD::Sys::Table);
 
-if ($haveProcProcessTable) { import Proc::ProcessTable; }
-
 @colNames =
   qw(uid gid euid egid pid ppid pgrp sess priority ttynum flags time ctime size rss wchan fname start pctcpu state pctmem cmndline ttydev);
 
+my %knownCols;
+
 sub getColNames() { @colNames }
+
+sub _init_knownCols
+{
+    my $table = $_[0];
+    unless( 0 == scalar( @$table ) )
+    {
+	%knownCols = map { $_ => ( eval { $table->[0]->$_() } || 0 ) } @colNames;
+    }
+}
 
 sub collect_data()
 {
     my @data;
-    my $pt = Proc::ProcessTable->new();
 
-    foreach my $proc ( @{ $pt->table } )
+    my $pt = Proc::ProcessTable->new();
+    my $table = $pt->table();
+
+    _init_knownCols($table) if( 0 == scalar( keys %knownCols ) );
+
+    foreach my $proc ( @{ $table } )
     {
         my @row;
 
         #@row = (@$pt{@colNames});      # calls an error, proc::processtable bugged, handle as seen below.
-        @row = map { $proc->$_() } @colNames;
+        @row = map { $knownCols{$_} ? $proc->$_() : undef } @colNames;
 
         push( @data, \@row );
     }
@@ -364,11 +377,6 @@ use strict;
 use warnings;
 use vars qw(@colNames);
 use vars qw(@ISA);
-use Net::Interface qw(
-  :afs
-  :iffs
-  :iftype
-  mac_bin2hex);
 use Socket qw(inet_ntoa);
 use Socket6 qw(inet_ntop);
 
@@ -383,12 +391,12 @@ sub getColNames() { @colNames }
 sub getflags($)
 {
     my $flags = $_[0] // 0;
-    my $txt = ( $flags & IFF_UP ) ? '<up' : '<down';
+    my $txt = ( $flags & eval ' Net::Interface::IFF_UP ' ) ? '<up' : '<down';
     foreach my $iffname ( sort @{ $Net::Interface::EXPORT_TAGS{iffs} } )
     {
         no strict;
         my $v = eval { &$iffname() + 0; };
-        next if $v == IFF_UP;
+        next if $v == eval ' Net::Interface::IFF_UP ';
         if ( $flags & $v )
         {
             my $x = eval { &$iffname(); };
