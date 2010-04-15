@@ -214,6 +214,8 @@ Scheduling class name                 #FIX ME!
 
 =back
 
+=back
+
 =head1 PREREQUISITES
 
 This plugin only works on Unix or unixoide systems.
