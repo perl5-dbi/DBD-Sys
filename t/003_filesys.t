@@ -4,6 +4,7 @@ use Test::More tests => 7;    # the number of the tests to run.
 use FindBin qw($RealBin);     # class for getting the pathname.
 
 use DBI;
+use Data::Dumper;
 
 my $haveSysFilesystem     = 0;
 my $haveFilesysDfPortable = 0;
@@ -47,6 +48,7 @@ SKIP:
 
     while ( $row = $st->fetchrow_hashref() )
     {
+        diag( Dumper($row) );
         cmp_ok( $row->{bfree} + $row->{bused},
                 '==', $row->{blocks}, 'free blocks + used blocks = total blocks in filesysdf' );
     }

@@ -270,6 +270,7 @@ eval {
 
 eval {
     require Net::Interface;
+    require Socket6;
     $haveNetInterface = 1;
     $supportedTables{netint} = 'DBD::Sys::Plugin::Unix::NetInterface';
 };
@@ -282,6 +283,14 @@ use strict;
 use warnings;
 use vars qw(@colNames);
 
+BEGIN
+{
+    if( $^O eq 'MSWin32' )
+    {
+        require Win32::pwent;
+    }
+}
+
 use base qw(DBD::Sys::Table);
 
 @colNames = qw(username passwd uid gid quota comment gcos dir shell expire);
@@ -292,12 +301,24 @@ sub collect_data()
 {
     my @data;
 
-    endpwent();    # ensure we're starting fresh ...
-    while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = getpwent() )
+    if( $^O eq 'MSWin32' )
     {
-        push( @data, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
+        Win32::pwent::endpwent();    # ensure we're starting fresh ...
+        while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = Win32::pwent::getpwent() )
+        {
+            push( @data, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
+        }
+        Win32::pwent::endpwent();
     }
-    endpwent();
+    else
+    {
+        endpwent();    # ensure we're starting fresh ...
+        while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = getpwent() )
+        {
+            push( @data, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
+        }
+        endpwent();
+    }
 
     \@data;
 }
@@ -307,6 +328,14 @@ package DBD::Sys::Plugin::Unix::GrEnt;
 use strict;
 use warnings;
 use vars qw(@colNames);
+
+BEGIN
+{
+    if( $^O eq 'MSWin32' )
+    {
+        require Win32::pwent;
+    }
+}
 
 use base qw(DBD::Sys::Table);
 
@@ -318,12 +347,24 @@ sub collect_data()
 {
     my @data;
 
-    endgrent();    # ensure we're starting fresh ...
-    while ( my ( $name, $grpass, $gid, $members ) = getgrent() )
+    if( $^O eq 'MSWin32' )
     {
-        push( @data, [ $name, $grpass, $gid, $members ] );
+        Win32::pwent::endgrent();    # ensure we're starting fresh ...
+        while ( my ( $name, $grpass, $gid, $members ) = Win32::pwent::getgrent() )
+        {
+            push( @data, [ $name, $grpass, $gid, $members ] );
+        }
+        Win32::pwent::endgrent();
     }
-    endgrent();
+    else
+    {
+        endgrent();    # ensure we're starting fresh ...
+        while ( my ( $name, $grpass, $gid, $members ) = getgrent() )
+        {
+            push( @data, [ $name, $grpass, $gid, $members ] );
+        }
+        endgrent();
+    }
 
     \@data;
 }
@@ -379,8 +420,6 @@ use strict;
 use warnings;
 use vars qw(@colNames);
 use vars qw(@ISA);
-use Socket qw(inet_ntoa);
-use Socket6 qw(inet_ntop);
 
 use base qw(DBD::Sys::Table);
 
@@ -447,9 +486,9 @@ sub collect_data()
 
                     foreach my $i ( 0 .. $#address )
                     {
-                        my $addr_str  = inet_ntop( $af, $address[$i] );
-                        my $netm_str  = inet_ntop( $af, $netmask[$i] );
-                        my $broad_str = inet_ntop( $af, $broadcast[$i] ) if ( defined( $broadcast[$i] ) );
+                        my $addr_str  = Socket6::inet_ntop( $af, $address[$i] );
+                        my $netm_str  = Socket6::inet_ntop( $af, $netmask[$i] );
+                        my $broad_str = Socket6::inet_ntop( $af, $broadcast[$i] ) if ( defined( $broadcast[$i] ) );
 
                         push( @data,
                                    [

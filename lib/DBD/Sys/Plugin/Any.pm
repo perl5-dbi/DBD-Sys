@@ -238,7 +238,8 @@ sub collect_data()
     foreach my $filesys (@filesystems)
     {
         my @row;
-        my $df = dfportable( $fs->mount_point($filesys), $blocksize );
+        my $mountpt = $fs->mount_point($filesys);
+        my $df = dfportable( $mountpt, $blocksize );
         if ( defined($df) )
         {
             @row = (
