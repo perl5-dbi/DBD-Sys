@@ -11,13 +11,13 @@ use Scalar::Util qw(weaken);
 
 sub new
 {
-    my ($className,$owner,$attrs) = @_;
+    my ( $className, $owner, $attrs ) = @_;
     my %table = (
                   col_names => [ $className->getColNames() ],
                   col_nums  => {},
                   pos       => 0,
                   owner     => $owner,
-		  attrs     => $attrs,
+                  attrs     => $attrs,
                 );
 
     my $i = 0;

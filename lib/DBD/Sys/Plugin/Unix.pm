@@ -285,7 +285,7 @@ use vars qw(@colNames);
 
 BEGIN
 {
-    if( $^O eq 'MSWin32' )
+    if ( $^O eq 'MSWin32' )
     {
         require Win32::pwent;
     }
@@ -301,10 +301,11 @@ sub collect_data()
 {
     my @data;
 
-    if( $^O eq 'MSWin32' )
+    if ( $^O eq 'MSWin32' )
     {
         Win32::pwent::endpwent();    # ensure we're starting fresh ...
-        while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = Win32::pwent::getpwent() )
+        while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) =
+                Win32::pwent::getpwent() )
         {
             push( @data, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
         }
@@ -312,7 +313,7 @@ sub collect_data()
     }
     else
     {
-        endpwent();    # ensure we're starting fresh ...
+        endpwent();                  # ensure we're starting fresh ...
         while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = getpwent() )
         {
             push( @data, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
@@ -331,7 +332,7 @@ use vars qw(@colNames);
 
 BEGIN
 {
-    if( $^O eq 'MSWin32' )
+    if ( $^O eq 'MSWin32' )
     {
         require Win32::pwent;
     }
@@ -347,7 +348,7 @@ sub collect_data()
 {
     my @data;
 
-    if( $^O eq 'MSWin32' )
+    if ( $^O eq 'MSWin32' )
     {
         Win32::pwent::endgrent();    # ensure we're starting fresh ...
         while ( my ( $name, $grpass, $gid, $members ) = Win32::pwent::getgrent() )
@@ -358,7 +359,7 @@ sub collect_data()
     }
     else
     {
-        endgrent();    # ensure we're starting fresh ...
+        endgrent();                  # ensure we're starting fresh ...
         while ( my ( $name, $grpass, $gid, $members ) = getgrent() )
         {
             push( @data, [ $name, $grpass, $gid, $members ] );
@@ -387,9 +388,12 @@ sub getColNames() { @colNames }
 sub _init_knownCols
 {
     my $table = $_[0];
-    unless( 0 == scalar( @$table ) )
+    unless ( 0 == scalar(@$table) )
     {
-	%knownCols = map { $_ => ( eval { $table->[0]->$_() } || 0 ) } @colNames;
+        %knownCols = map
+        {
+            $_ => ( eval { $table->[0]->$_() } || 0 )
+        } @colNames;
     }
 }
 
@@ -397,12 +401,12 @@ sub collect_data()
 {
     my @data;
 
-    my $pt = Proc::ProcessTable->new();
+    my $pt    = Proc::ProcessTable->new();
     my $table = $pt->table();
 
-    _init_knownCols($table) if( 0 == scalar( keys %knownCols ) );
+    _init_knownCols($table) if ( 0 == scalar( keys %knownCols ) );
 
-    foreach my $proc ( @{ $table } )
+    foreach my $proc ( @{$table} )
     {
         my @row;
 
@@ -490,14 +494,12 @@ sub collect_data()
                         my $netm_str  = Socket6::inet_ntop( $af, $netmask[$i] );
                         my $broad_str = Socket6::inet_ntop( $af, $broadcast[$i] ) if ( defined( $broadcast[$i] ) );
 
-                        push( @data,
-                                   [
-                                   $if->{name}, $afname,
-                                   $addr_str,
-                                   $netm_str,
-                                   $broad_str,
-                                   $mac, $if->{flags}, $flags, $if->{mtu}, $if->{metric},
-                                   ]
+                        push(
+                              @data,
+                              [
+                                 $if->{name}, $afname,      $addr_str, $netm_str,  $broad_str,
+                                 $mac,        $if->{flags}, $flags,    $if->{mtu}, $if->{metric},
+                              ]
                             );
                     }
                 }

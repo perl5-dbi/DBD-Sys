@@ -70,19 +70,20 @@ sub connect
 
     # Process attributes from the DSN; we assume ODBC syntax
     # here, that is, the DSN looks like var1=val1;...;varN=valN
-         foreach my $var ( split /;/, $dr_dsn ) {
-             my ($attr_name, $attr_value) = split( '=', $var, 2 );
-              return $drh->set_err($DBI::stderr, "Can't parse DSN part '$var'")
-                  unless defined $attr_value;
+    foreach my $var ( split /;/, $dr_dsn )
+    {
+        my ( $attr_name, $attr_value ) = split( '=', $var, 2 );
+        return $drh->set_err( $DBI::stderr, "Can't parse DSN part '$var'" )
+          unless defined $attr_value;
 
-    # add driver prefix to attribute name if it doesn't have it already
-              $attr_name = $driver_prefix.$attr_name
-                  unless $attr_name =~ /^$driver_prefix/o;
+        # add driver prefix to attribute name if it doesn't have it already
+        $attr_name = $driver_prefix . $attr_name
+          unless $attr_name =~ /^$driver_prefix/o;
 
-    # Store attribute into %$attr, replacing any existing value.
-    # The DBI will STORE() these into $dbh after we've connected
-              $dbh->{$attr_name} = $attr_value;
-          }
+        # Store attribute into %$attr, replacing any existing value.
+        # The DBI will STORE() these into $dbh after we've connected
+        $dbh->{$attr_name} = $attr_value;
+    }
 
     return $outer;
 }
@@ -409,10 +410,10 @@ my %tables2classes;
 
 sub new($$)
 {
-    my ($class,$statement,$parser,$dbh) = @_;
-    my $self = $class->SUPER::new($statement,$parser);
+    my ( $class, $statement, $parser, $dbh ) = @_;
+    my $self = $class->SUPER::new( $statement, $parser );
     $self->{dbh} = $dbh;
-    weaken($self->{dbh});
+    weaken( $self->{dbh} );
     $self;
 }
 
@@ -441,16 +442,16 @@ sub open_table($$$$$)
     $self->initTables2Classes() unless ( _HASH( \%tables2classes ) );
 
     my $attr_prefix = 'sys_' . lc($table) . '_';
-    my $attrs = {};
-    foreach my $attr (keys %{$self->{dbh}})
+    my $attrs       = {};
+    foreach my $attr ( keys %{ $self->{dbh} } )
     {
-	next unless( $attr =~ m/^$attr_prefix(.+)$/ );
+        next unless ( $attr =~ m/^$attr_prefix(.+)$/ );
         $attrs->{$1} = $self->{dbh}->{$attr};
     }
     my $tblClass = $tables2classes{ lc $table };
     croak("Specified table '$table' not known") unless ($tblClass);
 
-    my $tbl = $tblClass->new($self, $attrs);
+    my $tbl = $tblClass->new( $self, $attrs );
 
     $tbl;
 }
