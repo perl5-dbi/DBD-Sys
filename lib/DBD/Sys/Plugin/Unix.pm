@@ -225,6 +225,10 @@ The module C<Proc::Processtable> is required to run the module C<Procs>.
 
 No known bugs at this moment.
 
+The implementation of L<Proc::ProcessTable> is very limited for several
+platforms and should improved. L<Net::Interface> lacks MSWin32 support
+and needs help porting from autoconf to hints framework.
+
 =head1 AUTHOR
 
     Jens Rehsack			Alexander Breibach
@@ -390,8 +394,7 @@ sub _init_knownCols
     my $table = $_[0];
     unless ( 0 == scalar(@$table) )
     {
-        %knownCols = map
-        {
+        %knownCols = map {
             $_ => ( eval { $table->[0]->$_() } || 0 )
         } @colNames;
     }
