@@ -23,9 +23,25 @@ Columns:
 
 =over 12
 
-=item tablename
+=item table_qualifier
 
-Name of the table.
+Unused, I<NULL>.
+
+=item table_owner
+
+Unused, I<NULL>
+
+=item table_name
+
+Name of the table
+
+=item table_type
+
+Class name of the table implementation
+
+=item remarks
+
+Unused, I<NULL>
 
 =back
 
@@ -78,14 +94,21 @@ use vars qw(@colNames);
 
 use base qw(DBD::Sys::Table);
 
-@colNames = qw(tablename);
+@colNames = qw(table_qualifier table_owner table_name table_type remarks);
 
 sub getColNames() { @colNames }
 
 sub collect_data()
 {
-    my @data = map { [$_] } $_[0]->{owner}->getTableList();
+    my @data;
+    my %tables = $_[0]->{owner}->getTableDetails();
 
-    \@data;
+    while ( my ( $table, $class ) = each(%tables) )
+    {
+        push( @data, [ undef, undef, $table, 'TABLE', $class ] );
+    }
+
+    return \@data;
 }
 
+1;
