@@ -1,6 +1,6 @@
 =head1 NAME
 
-DBD::Sys::Plugins - embed own tables to DBD::Sys
+DBD::Sys::Plugin - embed own tables to DBD::Sys
 
 =head1 DESCRIPTION
 
