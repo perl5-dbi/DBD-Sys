@@ -24,3 +24,5 @@ _Inline/.*
 ^_build/.*
 ~$
 .*\.planner
+^MYMETA.yml$
+DBI-Sys-.*

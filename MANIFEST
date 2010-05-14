@@ -1,5 +1,8 @@
 Build.PL
 Changes
+examples/dfportable.pl
+examples/filesys.pl
+examples/netinterface.pl
 examples/proc_count_user.pl
 lib/Bundle/DBD/Sys.pm
 lib/DBD/Sys.pm
@@ -7,6 +10,7 @@ lib/DBD/Sys/Plugin.pod
 lib/DBD/Sys/Plugin/Any.pm
 lib/DBD/Sys/Plugin/Meta.pm
 lib/DBD/Sys/Plugin/Unix.pm
+lib/DBD/Sys/Roadmap.pod
 lib/DBD/Sys/Table.pm
 LICENSE
 Makefile.PL
@@ -18,4 +22,7 @@ t/001_load.t
 t/002_checktbls.t
 t/003_filesys.t
 t/004_process.t
+t/005_netinterface.t
+t/manifest.t
+t/pod.t
 Todo
