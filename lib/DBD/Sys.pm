@@ -540,16 +540,13 @@ and 4.
 
 To retrieve data, you can use the following example:
 
-        my $username = getpwuid($<);
-        my $groupname = getgrgid($();
-
         my $dbh = DBI->connect('DBI:Sys:');
-        $st  = $dbh->prepare( 'SELECT DISTINCT username, uid FROM pwent WHERE uid=?' );
-        $num = $st->execute($<);
-                while( $row = $st->fetchrow_hashref() )
-                {       
-                    print( "Found result row: uid = $uid, username = $username\n"  );
-                }       
+        $st  = $dbh->prepare( 'SELECT DISTINCT username, uid FROM pwent WHERE username=?' );
+        $num = $st->execute(getlogin() || $ENV{USER} || $ENV{USERNAME});
+	while( $row = $st->fetchrow_hashref() )
+	{       
+	    printf( "Found result row: uid = %d, username = %s\n", $row->{uid}, $row->{username} );
+	}       
 
 =head2 Error handling
 
