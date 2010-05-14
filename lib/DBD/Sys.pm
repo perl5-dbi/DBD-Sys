@@ -222,6 +222,15 @@ sub quote($$;$)
     "'$str'";
 }
 
+sub table_info($)
+{
+    my ($dbh) = @_;
+    my $sth = $dbh->prepare("SELECT * FROM alltables");
+    return unless ($sth);
+
+    return $sth;
+}
+
 sub disconnect($)
 {
     $_[0]->STORE( 'Active', 0 );
@@ -414,7 +423,7 @@ sub new($$)
     my $self = $class->SUPER::new( $statement, $parser );
     $self->{dbh} = $dbh;
     weaken( $self->{dbh} );
-    $self;
+    return $self;
 }
 
 sub initTables2Classes()
@@ -427,13 +436,19 @@ sub initTables2Classes()
         %tables2classes = ( %tables2classes, map { lc $_ => $pluginTables{$_} } keys %pluginTables );
     }
 
-    $self;
+    return $self;
 }
 
 sub getTableList()
 {
     $_[0]->initTables2Classes() unless ( _HASH( \%tables2classes ) );
-    keys %tables2classes;
+    return keys %tables2classes;
+}
+
+sub getTableDetails()
+{
+    $_[0]->initTables2Classes() unless ( _HASH( \%tables2classes ) );
+    return %tables2classes;
 }
 
 sub open_table($$$$$)
@@ -453,7 +468,7 @@ sub open_table($$$$$)
 
     my $tbl = $tblClass->new( $self, $attrs );
 
-    $tbl;
+    return $tbl;
 }
 
 #################### main pod documentation start ###################
@@ -570,7 +585,8 @@ LICENSE file included with this module.
 
 =head1 SUPPORT
 
-Free support can be requested via regular CPAN bug-tracking system. There is
+Free support can be requested via regular CPAN bug-tracking system at
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBD-Sys>. There is
 no guaranteed reaction time or solution time. It depends on business load.
 That doesn't mean that ticket via rt aren't handles as soon as possible,
 that means that soon depends on how much I have to do.
@@ -588,6 +604,3 @@ L<SQL::Statement>.
 #################### main pod documentation end ###################
 
 1;
-
-# The preceding line will help the module return a true value
-
