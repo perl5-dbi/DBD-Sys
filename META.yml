@@ -1,24 +1,15 @@
 ---
-name: DBD-Sys
-version: 0.01
+abstract: 'System tables interface via DBI'
 author:
   - 'Jens Rehsack <rehsack@cpan.org>, Alexander Breibach <alexander.breibach@googlemail.com>'
-abstract: System tables interface via DBI
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  DBI: 1.41
-  Module::Pluggable: 3.9
-  Params::Util: 1.00
-  SQL::Statement: 1.20
-  Scalar::Util: 1.00
-recommends:
-  Filesys::DfPortable: 0.83
-  Proc::ProcessTable: 0.45
-  Sys::Filesystem: 1.00
 configure_requires:
-  Module::Build: 0.35
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBD-Sys
 provides:
   Bundle::DBD::Sys:
     file: lib/Bundle/DBD/Sys.pm
@@ -40,6 +31,8 @@ provides:
     file: lib/DBD/Sys/Plugin/Unix.pm
   DBD::Sys::Plugin::Unix::GrEnt:
     file: lib/DBD/Sys/Plugin/Unix.pm
+  DBD::Sys::Plugin::Unix::NetInterface:
+    file: lib/DBD/Sys/Plugin/Unix.pm
   DBD::Sys::Plugin::Unix::Procs:
     file: lib/DBD/Sys/Plugin/Unix.pm
   DBD::Sys::Plugin::Unix::PwEnt:
@@ -54,7 +47,15 @@ provides:
     file: lib/DBD/Sys.pm
   DBD::Sys::st:
     file: lib/DBD/Sys.pm
-generated_by: Module::Build version 0.35
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+recommends:
+  DBI: 1.611
+  SQL::Statement: 1.27
+requires:
+  DBI: 1.605
+  Module::Pluggable: 3.9
+  Params::Util: 1.00
+  SQL::Statement: 1.22
+  Scalar::Util: 1.00
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01
