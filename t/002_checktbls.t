@@ -34,11 +34,11 @@ my $foundAllTables = 0;
 
 ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect');
 
-ok( my $st  = $dbh->prepare( 'SELECT tablename FROM alltables' ), 'prepare alltables' );
+ok( my $st  = $dbh->prepare( 'SELECT table_name FROM alltables' ), 'prepare alltables' );
 ok( my $num = $st->execute(), 'execute alltables' );
 while( $row = $st->fetchrow_hashref() )
 {
-    ++$foundAllTables if( $row->{tablename} eq 'alltables' );
+    ++$foundAllTables if( $row->{table_name} eq 'alltables' );
 }
 ok( $foundAllTables, 'found alltables' );
 
