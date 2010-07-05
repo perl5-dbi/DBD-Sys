@@ -1,3 +1,18 @@
+package DBD::Sys::Plugin;
+
+use strict;
+use warnings;
+
+use vars qw($VERSION);
+
+use Carp qw(croak);
+
+$VERSION = "0.02";
+
+sub getSupportedTables { croak "Abstract method 'getSupportedTables' called"; }
+
+1;
+
 =head1 NAME
 
 DBD::Sys::Plugin - embed own tables to DBD::Sys
@@ -21,6 +36,8 @@ must return a hash containing the provided tables as key and the classes which
 implement the tables as associated value, e.g.:
 
   package DBD::Sys::Plugin::Foo;
+
+  use base qw(DBD::Sys::Plugin);
 
   sub getSupportedTables()
   {

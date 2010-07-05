@@ -2,26 +2,24 @@ package DBD::Sys::Table;
 
 use strict;
 use warnings;
-use vars qw(@ISA);
+use vars qw(@ISA $VERSION);
 
 require SQL::Eval;
+require DBI::DBD::SqlEngine;
 use Scalar::Util qw(weaken);
 
-@ISA = qw(SQL::Eval::Table);
+@ISA = qw(DBI::DBD::SqlEngine::Table);
+$VERSION = 0.02;
 
 sub new
 {
     my ( $className, $owner, $attrs ) = @_;
     my %table = (
                   col_names => [ $className->getColNames() ],
-                  col_nums  => {},
                   pos       => 0,
                   owner     => $owner,
                   attrs     => $attrs,
                 );
-
-    my $i = 0;
-    %{ $table{col_nums} } = map { $_ => $i++ } @{ $table{col_names} };
 
     my $self = $className->SUPER::new( \%table );
 
@@ -29,7 +27,7 @@ sub new
 
     $self->{data} = $self->collect_data();
 
-    $self;
+    return $self;
 }
 
 sub fetch_row
