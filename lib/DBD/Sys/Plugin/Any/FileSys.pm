@@ -3,12 +3,13 @@ package DBD::Sys::Plugin::Any::FileSys;
 use strict;
 use warnings;
 
-use vars qw(@colNames);
+use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
 require Sys::Filesystem;
 
+$VERSION = "0.02";
 @colNames = qw(mountpoint mounted label volume device special type options);
 
 sub getColNames()  { @colNames }

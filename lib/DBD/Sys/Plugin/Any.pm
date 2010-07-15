@@ -3,7 +3,11 @@ package DBD::Sys::Plugin::Any;
 use strict;
 use warnings;
 
+use vars qw($VERSION);
+
 use base qw(DBD::Sys::Plugin);
+
+$VERSION = "0.02";
 
 #################### main pod documentation start ###################
 

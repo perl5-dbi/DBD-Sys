@@ -3,13 +3,14 @@ package DBD::Sys::Plugin::Any::FileSysDf;
 use strict;
 use warnings;
 
-use vars qw(@colNames);
+use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
 use Sys::Filesystem;
 use Filesys::DfPortable;
 
+$VERSION = "0.02";
 @colNames = qw(mountpoint blocks bfree bavail bused bper files ffree favail fused fper);
 
 sub getColNames()   { return @colNames }

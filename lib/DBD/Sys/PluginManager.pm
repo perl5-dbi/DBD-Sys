@@ -3,6 +3,8 @@ package DBD::Sys::PluginManager;
 use strict;
 use warnings;
 
+use vars qw($VERSION);
+
 require DBD::Sys::Plugin;
 require DBD::Sys::CompositeTable;
 
@@ -16,6 +18,8 @@ use Module::Pluggable
   search_path => ['DBD::Sys::Plugin'],
   inner       => 0,
   only        => qr/^DBD::Sys::Plugin::\p{Word}+$/;
+
+$VERSION = "0.02";
 
 sub new
 {
