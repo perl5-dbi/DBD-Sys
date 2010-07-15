@@ -59,6 +59,14 @@ sub fetch_row
     $_[0]->{row};
 }
 
+sub DESTROY
+{
+    my $self = $_[0];
+    delete $self->{owner};
+    delete $self->{database};
+    delete $self->{meta};
+}
+
 #################### main pod documentation start ###################
 
 =head1 NAME
