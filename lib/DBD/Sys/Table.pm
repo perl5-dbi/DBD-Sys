@@ -45,10 +45,10 @@ sub new
 
 sub fetch_row
 {
-    unless(blessed($_[0]))
+    unless ( blessed( $_[0] ) )
     {
-	my @caller = caller();
-	die "Invalid invocation on unblessed '$_[0]' from $caller[0] at $caller[2] in $caller[1]";
+        my @caller = caller();
+        die "Invalid invocation on unblessed '$_[0]' from $caller[0] at $caller[2] in $caller[1]";
     }
     $_[0]->{row} = undef;
     if ( $_[0]->{pos} < scalar( @{ $_[0]->{data} } ) )

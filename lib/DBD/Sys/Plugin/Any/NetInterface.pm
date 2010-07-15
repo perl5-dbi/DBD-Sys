@@ -18,8 +18,8 @@ if ($haveNetInterface) { import Net::Interface; }
 
 @colNames = qw(interface address_family address netmask broadcast hwadress flags_bin flags mtu metric);
 
-sub getTableName() { return 'netint'; }
-sub getColNames()  { @colNames }
+sub getTableName()  { return 'netint'; }
+sub getColNames()   { @colNames }
 sub getPrimaryKey() { return 'address'; }
 
 $haveNetInterface and *getflags = sub {
