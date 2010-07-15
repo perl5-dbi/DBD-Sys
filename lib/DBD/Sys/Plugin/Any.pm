@@ -28,12 +28,26 @@ etc. See L<DBD::Sys::Plugin::Any::FileSys> for details.
 Table containing group informations. See L<DBD::Sys::Plugin::Any::FileSysDf>
 for details.
 
+=item procs
+
+Table containing process information. See L<DBD::Sys::Plugin::Any::Procs>
+for details.
+
+=item netint
+
+Table containing network interface information. See
+L<DBD::Sys::Plugin::Any::NetInterface> for details.
+
 =back
 
 =head1 BUGS & LIMITATIONS
 
 No known bugs at this moment. This module will be advanced in future to work
 even if the required modules (see PREREQUISITES) are not present.
+
+The implementation of L<Proc::ProcessTable> is very limited for several
+platforms and should improved. L<Net::Interface> lacks MSWin32 support
+and needs help porting from autoconf to hints framework.
 
 =head1 AUTHOR
 

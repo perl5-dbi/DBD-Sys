@@ -29,28 +29,15 @@ Table containing user information.
 
 Table containing group information
 
-=item procs
-
-Table containing process information
-
-=item netint
-
-Table containing network interface information.
-
 =back
 
 =head1 PREREQUISITES
 
 This plugin only works on Unix or unixoide systems.
-The module C<Proc::Processtable> is required to run the module C<Procs>.
 
 =head1 BUGS & LIMITATIONS
 
 No known bugs at this moment.
-
-The implementation of L<Proc::ProcessTable> is very limited for several
-platforms and should improved. L<Net::Interface> lacks MSWin32 support
-and needs help porting from autoconf to hints framework.
 
 =head1 AUTHOR
 

@@ -1,4 +1,4 @@
-package DBD::Sys::Plugin::Unix::Procs;
+package DBD::Sys::Plugin::Any::Procs;
 
 use strict;
 use warnings;
@@ -194,6 +194,10 @@ Path of process's tty
 Scheduling class name                 #FIX ME!
 
 =back
+
+=head1 PREREQUISITES
+
+The module C<Proc::Processtable> is required to provide data for the table.
 
 =head1 AUTHOR
 

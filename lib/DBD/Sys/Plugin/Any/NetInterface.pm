@@ -1,4 +1,4 @@
-package DBD::Sys::Plugin::Unix::NetInterface;
+package DBD::Sys::Plugin::Any::NetInterface;
 
 use strict;
 use warnings;
@@ -20,6 +20,7 @@ if ($haveNetInterface) { import Net::Interface; }
 
 sub getTableName() { return 'netint'; }
 sub getColNames()  { @colNames }
+sub getPrimaryKey() { return 'address'; }
 
 $haveNetInterface and *getflags = sub {
     my $flags = $_[0] // 0;
@@ -110,6 +111,57 @@ DBD::Sys::Plugin::Unix::netInterface - provides a table containing the known net
   $alltables = $dbh->selectall_hashref("select * from netint", "interface");
 
 =head1 DESCRIPTION
+
+Columns:
+
+=over 8
+
+=item interface
+
+Interface name (e.g. eth0, em0, ...)
+
+=item address_family
+
+Address family of following address
+
+=item address
+
+The address of the interface (addresses are unique, interfaces can have
+multiple addresses).
+
+=item netmask
+
+Netmask of the address above.
+
+=item broadcast
+
+Broadcast address for network address
+
+=item hwadress
+
+Hardware address (MAC number) of the interface NIC.
+
+=item flags_bin
+
+Binary representation of the interface flags (at least I<up> or I<down>).
+
+=item flags
+
+Comma separated list of the flags.
+
+=item mtu
+
+MTU for this address in this interface.
+
+=item metric
+
+Metric for the interface/address.
+
+=back
+
+=head1 PREREQUISITES
+
+The module C<Net::Interface> is required to provide data for the table.
 
 =head1 AUTHOR
 
