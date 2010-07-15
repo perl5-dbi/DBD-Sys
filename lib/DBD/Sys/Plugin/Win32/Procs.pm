@@ -7,39 +7,50 @@ use vars qw($VERSION @colNames);
 use base qw(DBD::Sys::Table);
 
 $VERSION  = "0.02";
-@colNames = qw(pid uid cmndline start run state);
+@colNames = qw(pid ppid uid sess cmndline start fulltime virtsize fname state threads);
+
+my ($have_win32_process_info, $have_win32_process_commandline ) = (0,0);
+eval { require Win32::Process::Info; $have_win32_process_info = 1; };
+eval { require Win32::Process::CommandLine; $have_win32_process_commandline = 1; };
+
+Win32::Process::Info->import('NT','WMI') if( $have_win32_process_info );
+Win32::Process::CommandLine->import() if( $have_win32_process_commandline );
 
 sub getColNames()   { @colNames }
 sub getPrimaryKey() { return 'pid'; }
+
+use Data::Dumper;
 
 sub collectData
 {
     my $self = $_[0];
     my @data;
 
-    eval {
-        require Win32::Process::Info;
-        Win32::Process::Info->import();
-        require Win32::Process::CommandLine;
-        Win32::Process::CommandLine->import();
+    if( $have_win32_process_info )
+    {
         for my $procInfo ( Win32::Process::Info->new()->GetProcInfo() )
         {
             ( my $uid = $procInfo->{OwnerSid} || 0 ) =~ s/.*-//;
             my $cli = "";
-            Win32::Process::CommandLine::GetPidCommandLine( $procInfo->{ProcessId}, $cli );
+            Win32::Process::CommandLine::GetPidCommandLine( $procInfo->{ProcessId}, $cli ) if($have_win32_process_commandline);
             $cli ||= "";
             $cli =~ s{^\S+\\}{};
             $cli =~ s{\s+$}{};
             push( @data,
                   $procInfo->{ProcessId},
+                  $procInfo->{ParentProcessId} || 0,
                   $uid,
-                  $cli || $_->{Name} || "<dead>",
-                  fmt_stime( $_->{CreationDate} ),
-                  fmt_time( int( ( $_->{KernelModeTime} // 0 ) + ( $_->{UserModeTime} // 0 ) + .499 ) ),
-                  $procInfo->{_status},
+                  $procInfo->{SessionId} || 0,
+                  $cli || $procInfo->{Name} || "<dead>",
+                  $procInfo->{CreationDate},
+                  int( ( $procInfo->{KernelModeTime} || 0 ) + ( $procInfo->{UserModeTime} || 0 ) + .499 ),
+                  $procInfo->{VirtualSize} || $procInfo->{WorkingSetSize},
+                  $procInfo->{ExecutablePath},
+                  $procInfo->{_status} || $procInfo->{Status} || $procInfo->{ExecutionState},
+                  $procInfo->{ThreadCount} || 1,
                 );
         }
-    };
+    }
 
     return \@data;
 }

@@ -4,13 +4,26 @@ use Test::More;		           # the number of the tests to run.
 use DBI;
 use Data::Dumper;
 
-my $have_proc_processtable = 0;
+my ($have_proc_processtable, $have_win32_proc_info, $have_appropriate ) = ( 0, 0, 0 );
 eval { require Proc::ProcessTable; $have_proc_processtable = 1; };
-plan( skip_all => 'Proc::ProcessTable is required for this test' ) unless $have_proc_processtable;
+eval { require Win32::Process::Info; require Win32::Process::CommandLine; $have_win32_proc_info = 1; };
 plan( tests => 8 );
 
-my $pt = Proc::ProcessTable->new();
-my $table = $pt->table();
+my $table;
+
+if( $have_proc_processtable )
+{
+    my $pt = Proc::ProcessTable->new();
+    $table = $pt->table();
+}
+elsif( $have_win32_proc_info )
+{
+    $table = [ Win32::Process::Info->new()->GetProcInfo() ];
+}
+else
+{
+    $table = [];
+}
 
 my $found = 0;
 

@@ -12,30 +12,36 @@ $VERSION  = "0.02";
 sub getTableName() { return 'grent'; }
 sub getColNames()  { @colNames }
 
+my $havegrent = 0;
+eval { endgrent(); my @grentry = getgrent(); endgrent(); $havegrent = 1; };
+
 sub collectData()
 {
     my %data;
 
-    endgrent();    # ensure we're starting fresh ...
-    while ( my ( $name, $grpass, $gid, $members ) = getgrent() )
+    if( $havegrent )
     {
-        if ( defined( $data{$name} ) )    # FBSD seems to have a bug with multiple entries
+        endgrent();    # ensure we're starting fresh ...
+        while ( my ( $name, $grpass, $gid, $members ) = getgrent() )
         {
-            my $row = $data{$name};
-            unless (     ( $row->[0] eq $name )
-                     and ( $row->[1] eq $grpass )
-                     and ( $row->[2] == $gid )
-                     and ( $row->[3] eq $members ) )
+            if ( defined( $data{$name} ) )    # FBSD seems to have a bug with multiple entries
             {
-                warn "$name is delivered more than once and the group information differs from the first one";
+                my $row = $data{$name};
+                unless (     ( $row->[0] eq $name )
+                         and ( $row->[1] eq $grpass )
+                         and ( $row->[2] == $gid )
+                         and ( $row->[3] eq $members ) )
+                {
+                    warn "$name is delivered more than once and the group information differs from the first one";
+                }
+            }
+            else
+            {
+                $data{$name} = [ $name, $grpass, $gid, $members ];
             }
         }
-        else
-        {
-            $data{$name} = [ $name, $grpass, $gid, $members ];
-        }
+        endgrent();
     }
-    endgrent();
 
     my @data = values %data;
     return \@data;
