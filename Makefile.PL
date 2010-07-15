@@ -5,10 +5,10 @@ WriteMakefile
           'NAME' => 'DBD::Sys',
           'VERSION_FROM' => 'lib/DBD/Sys.pm',
           'PREREQ_PM' => {
-                           'DBI' => '1.605',
+                           'DBI' => '1.612',
                            'Module::Pluggable' => '3.9',
                            'Params::Util' => '1.00',
-                           'SQL::Statement' => '1.22',
+                           'SQL::Statement' => '1.28',
                            'Scalar::Util' => '1.00'
                          },
           'INSTALLDIRS' => 'site',
