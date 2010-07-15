@@ -25,7 +25,8 @@ sub new
     my ( @embed, %allColNames, @allColNames, %mergeCols, $primaryKey );
     foreach my $tblClass (@tableClasses)
     {
-        my $embedded = $tblClass->new( clone($attrs) );
+	my %embedAttrs = %$attrs;
+        my $embedded = $tblClass->new( \%embedAttrs );
         push( @embed, $embedded );
         next if ( defined( $compositedInfo{$compositeName} ) );
 
@@ -36,6 +37,7 @@ sub new
             $primaryKey eq $embedPK
               or croak( "Primary key ($embedPK) of '$tblClass' differs from primary key ($primaryKey) of "
                         . join( ", ", keys %mergeCols ) );
+	    $mergeCols{$tblClass} = [];
             foreach my $colIdx ( 0 .. $#embedColNames )
             {
                 my $colName = $embedColNames[$colIdx];
