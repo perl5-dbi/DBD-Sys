@@ -7,10 +7,14 @@ use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
-use Sys::Filesystem;
-use Filesys::DfPortable;
+my $haveFilesysDf = 0;
+eval {
+    use Sys::Filesystem;
+    use Filesys::DfPortable;
+    $haveFilesysDf = 1;
+};
 
-$VERSION = "0.02";
+$VERSION  = "0.02";
 @colNames = qw(mountpoint blocks bfree bavail bused bper files ffree favail fused fper);
 
 sub getColNames()   { return @colNames }
@@ -21,30 +25,33 @@ sub collectData()
     my $self = $_[0];
     my @data;
 
-    my $fs          = Sys::Filesystem->new();
-    my @filesystems = $fs->filesystems( mounted => 1 );
-    my $blocksize   = $self->{attrs}->{blocksize} || 1;
-
-    foreach my $filesys (@filesystems)
+    if ($haveFilesysDf)
     {
-        my @row;
-        my $mountpt = $fs->mount_point($filesys);
-        my $df = dfportable( $mountpt, $blocksize );
-        if ( defined($df) )
+        my $fs          = Sys::Filesystem->new();
+        my @filesystems = $fs->filesystems( mounted => 1 );
+        my $blocksize   = $self->{attrs}->{blocksize} || 1;
+
+        foreach my $filesys (@filesystems)
         {
-            @row = (
-                     $fs->mount_point($filesys),
-                     @$df{ 'blocks', 'bfree', 'bavail', 'bused', 'per', 'files', 'ffree', 'favail', 'fused', 'fper' }
-                   );
+            my @row;
+            my $mountpt = $fs->mount_point($filesys);
+            my $df = dfportable( $mountpt, $blocksize );
+            if ( defined($df) )
+            {
+                @row = (
+                        $fs->mount_point($filesys),
+                        @$df{ 'blocks', 'bfree', 'bavail', 'bused', 'per', 'files', 'ffree', 'favail', 'fused', 'fper' }
+                       );
+            }
+            else
+            {
+                @row = ( $fs->mount_point($filesys), (undef) x 10 );
+            }
+            push( @data, \@row );
         }
-        else
-        {
-            @row = ( $fs->mount_point($filesys), (undef) x 10 );
-        }
-        push( @data, \@row );
     }
 
-    \@data;
+    return \@data;
 }
 
 =pod

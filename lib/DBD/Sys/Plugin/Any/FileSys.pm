@@ -7,9 +7,13 @@ use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
-require Sys::Filesystem;
+my $haveSysFs = 0;
+eval {
+    require Sys::Filesystem;
+    $haveSysFs = 1;
+};
 
-$VERSION = "0.02";
+$VERSION  = "0.02";
 @colNames = qw(mountpoint mounted label volume device special type options);
 
 sub getColNames()  { @colNames }
@@ -19,22 +23,25 @@ sub collectData()
 {
     my @data;
 
-    my $fs          = Sys::Filesystem->new();
-    my @filesystems = $fs->filesystems();
-
-    foreach my $filesys (@filesystems)
+    if ($haveSysFs)
     {
-        my @row;
-        @row = (
-                 $fs->mount_point($filesys), $fs->mounted($filesys),
-                 $fs->label($filesys),       $fs->volume($filesys),
-                 $fs->device($filesys),      $fs->special($filesys),
-                 $fs->type($filesys),        $fs->options($filesys)
-               );
-        push( @data, \@row );
+        my $fs          = Sys::Filesystem->new();
+        my @filesystems = $fs->filesystems();
+
+        foreach my $filesys (@filesystems)
+        {
+            my @row;
+            @row = (
+                     $fs->mount_point($filesys), $fs->mounted($filesys),
+                     $fs->label($filesys),       $fs->volume($filesys),
+                     $fs->device($filesys),      $fs->special($filesys),
+                     $fs->type($filesys),        $fs->options($filesys)
+                   );
+            push( @data, \@row );
+        }
     }
 
-    \@data;
+    return \@data;
 }
 
 =pod
