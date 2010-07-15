@@ -15,7 +15,7 @@ sub getColNames()  { @colNames }
 my @pwentcache;
 my $havepwent = 0;
 
-if( $^O eq 'freebsd' )
+if ( $^O eq 'freebsd' )
 {
     while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = getpwent() )
     {
@@ -32,18 +32,18 @@ sub collectData()
 {
     my @data;
 
-    if( @pwentcache)
+    if (@pwentcache)
     {
-	@data = @pwentcache;
+        @data = @pwentcache;
     }
-    elsif($havepwent)
+    elsif ($havepwent)
     {
-    endpwent();    # ensure we're starting fresh ...
-    while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = getpwent() )
-    {
-        push( @data, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
-    }
-    endpwent();
+        endpwent();    # ensure we're starting fresh ...
+        while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = getpwent() )
+        {
+            push( @data, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
+        }
+        endpwent();
     }
 
     return \@data;

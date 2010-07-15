@@ -9,12 +9,12 @@ use base qw(DBD::Sys::Table);
 $VERSION  = "0.02";
 @colNames = qw(pid ppid uid sess cmndline start fulltime virtsize fname state threads);
 
-my ($have_win32_process_info, $have_win32_process_commandline ) = (0,0);
-eval { require Win32::Process::Info; $have_win32_process_info = 1; };
+my ( $have_win32_process_info, $have_win32_process_commandline ) = ( 0, 0 );
+eval { require Win32::Process::Info;        $have_win32_process_info        = 1; };
 eval { require Win32::Process::CommandLine; $have_win32_process_commandline = 1; };
 
-Win32::Process::Info->import('NT','WMI') if( $have_win32_process_info );
-Win32::Process::CommandLine->import() if( $have_win32_process_commandline );
+Win32::Process::Info->import( 'NT', 'WMI' ) if ($have_win32_process_info);
+Win32::Process::CommandLine->import() if ($have_win32_process_commandline);
 
 sub getColNames()   { @colNames }
 sub getPrimaryKey() { return 'pid'; }
@@ -26,13 +26,14 @@ sub collectData
     my $self = $_[0];
     my @data;
 
-    if( $have_win32_process_info )
+    if ($have_win32_process_info)
     {
         for my $procInfo ( Win32::Process::Info->new()->GetProcInfo() )
         {
             ( my $uid = $procInfo->{OwnerSid} || 0 ) =~ s/.*-//;
             my $cli = "";
-            Win32::Process::CommandLine::GetPidCommandLine( $procInfo->{ProcessId}, $cli ) if($have_win32_process_commandline);
+            Win32::Process::CommandLine::GetPidCommandLine( $procInfo->{ProcessId}, $cli )
+              if ($have_win32_process_commandline);
             $cli ||= "";
             $cli =~ s{^\S+\\}{};
             $cli =~ s{\s+$}{};

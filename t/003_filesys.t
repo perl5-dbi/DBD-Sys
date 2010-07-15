@@ -20,7 +20,7 @@ SKIP:
         'prepare filesystems' );
     ok( $num = $st->execute(), 'execute filesystems' );
 
-    my $found   = 0;
+    my $found = 0;
 
     while ( $row = $st->fetchrow_hashref() )
     {

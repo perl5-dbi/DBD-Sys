@@ -19,7 +19,7 @@ sub collectData()
 {
     my %data;
 
-    if( $havegrent )
+    if ($havegrent)
     {
         endgrent();    # ensure we're starting fresh ...
         while ( my ( $name, $grpass, $gid, $members ) = getgrent() )
