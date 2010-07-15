@@ -21,7 +21,7 @@ sub driver($;$)
         no strict "refs";
         $attr->{Version} ||= ${ $class . "::VERSION" };
         $attr->{Name} or ( $attr->{Name} = $class ) =~ s/^DBD\:\://;
-	$attr->{Attribution} ||= 'DBD::Sys by Jens Rehsack';
+        $attr->{Attribution} ||= 'DBD::Sys by Jens Rehsack';
     }
 
     $drh = $class->SUPER::driver($attr);
@@ -40,7 +40,7 @@ use warnings;
 
 use vars qw(@ISA $imp_data_size);
 
-@ISA = qw(DBI::DBD::SqlEngine::dr);
+@ISA                         = qw(DBI::DBD::SqlEngine::dr);
 $DBD::Sys::dr::imp_data_size = 0;
 
 sub data_sources
@@ -62,7 +62,11 @@ use warnings;
 
 use vars qw(@ISA $imp_data_size);
 
-@ISA = qw(DBI::DBD::SqlEngine::db);
+use Carp qw(croak);
+
+require DBD::Sys::PluginManager;
+
+@ISA                         = qw(DBI::DBD::SqlEngine::db);
 $DBD::Sys::db::imp_data_size = 0;
 
 sub set_versions
@@ -70,66 +74,120 @@ sub set_versions
     my $dbh = shift;
     $dbh->{sys_version} = $DBD::Sys::VERSION;
 
-    return $dbh->SUPER::set_versions ();
-    }
+    return $dbh->SUPER::set_versions();
+}
 
 sub init_valid_attributes
 {
     my $dbh = shift;
 
     $dbh->{sys_valid_attrs} = {
-	sys_version        => 1, # DBD::File version
-	sys_valid_attrs    => 1, # File valid attributes
-	sys_readonly_attrs => 1, # File readonly attributes
-	};
-    $dbh->{f_readonly_attrs} = {
-	sys_version        => 1, # DBD::File version
-	sys_valid_attrs    => 1, # File valid attributes
-	sys_readonly_attrs => 1, # File readonly attributes
-	};
+                                sys_version         => 1,    # DBD::Sys version
+                                sys_valid_attrs     => 1,    # DBD::Sys valid attributes
+                                sys_readonly_attrs  => 1,    # DBD::Sys readonly attributes
+                                sys_pluginmgr       => 1,    # DBD::Sys plugin-manager
+                                sys_pluginmgr_class => 1,    # DBD::Sys plugin-manager class
+                                sys_plugin_attrs    => 1,    # DBD::Sys plugin attributes
+                              };
+    $dbh->{sys_readonly_attrs} = {
+                                   sys_version        => 1,     # DBD::File version
+                                   sys_valid_attrs    => 1,     # File valid attributes
+                                   sys_readonly_attrs => 1,     # File readonly attributes
+                                   sys_pluginmgr      => 1,     # DBD::Sys plugin-manager
+                                   sys_plugin_attrs   => 1,     # DBD::Sys plugin attributes
+                                 };
 
     return $dbh;
-    }
+}
+
+sub _load_class
+{
+    my ( $load_class, $missing_ok ) = @_;
+    no strict 'refs';
+    return 1 if @{"$load_class\::ISA"};    # already loaded/exists
+    ( my $module = $load_class ) =~ s!::!/!g;
+    eval { require "$module.pm"; };
+    return 1 unless $@;
+    return 0 if $missing_ok && $@ =~ /^Can't locate \Q$module.pm\E/;
+    croak $@;
+}
 
 sub init_default_attributes
 {
     my $dbh = shift;
 
     # must be done first, because setting flags implicitly calls $dbdname::db->STORE
-    $dbh->SUPER::init_default_attributes ();
+    $dbh->SUPER::init_default_attributes();
+
+    $dbh->{sys_pluginmgr_class} = "DBD::Sys::PluginManager";
+    $dbh->{sys_pluginmgr}       = DBD::Sys::PluginManager->new();
+    $dbh->{sys_plugin_attrs}    = $dbh->{sys_pluginmgr}->getTablesAttrs();
+    foreach my $plugin_attr ( keys %{ $dbh->{sys_plugin_attrs} } )
+    {
+        $dbh->{sys_valid_attrs}->{$plugin_attr} = 1;
+    }
 
     return $dbh;
 }
 
 sub validate_STORE_attr
 {
-    my ($dbh, $attrib, $value) = @_;
+    my ( $dbh, $attrib, $value ) = @_;
 
-    return $dbh->SUPER::validate_STORE_attr ($attrib, $value);
+    $attrib eq "sys_pluginmgr_class" and _load_class( $value, 0 );
+
+    return $dbh->SUPER::validate_STORE_attr( $attrib, $value );
+}
+
+sub STORE ($$$)
+{
+    my ( $dbh, $attrib, $value ) = @_;
+
+    $dbh->SUPER::STORE( $attrib, $value );
+
+    if ( $attrib eq "sys_pluginmgr_class" )
+    {
+        $dbh->{sys_pluginmgr} = $dbh->{sys_pluginmgr_class}->new();
+        my $sys_plugin_attrs = $dbh->{sys_pluginmgr}->getTablesAttrs();
+        foreach my $plugin_attr ( keys %{$sys_plugin_attrs} )
+        {
+            $dbh->{sys_valid_attrs}->{$plugin_attr} = 1;
+        }
+
+        foreach my $plugin_attr ( keys %{ $dbh->{sys_plugin_attrs} } )
+        {
+            unless ( exists( $sys_plugin_attrs->{$plugin_attr} ) )
+            {
+                exists $dbh->{$plugin_attr} and delete $dbh->{$plugin_attr};
+                delete $dbh->{sys_valid_attrs}->{$plugin_attr};
+            }
+        }
+
+        $dbh->{sys_plugin_attrs} = $sys_plugin_attrs;
+    }
+
+    return $dbh;
 }
 
 sub get_sys_versions
 {
-    my ($dbh, $table) = @_;
+    my ( $dbh, $table ) = @_;
 
     my $class = $dbh->{ImplementorClass};
 
-    return $dbh->{sys_version}; # sprintf "%s using %s", $dbh->{sys_version}, $dtype;
-    } # get_f_versions
+    return $dbh->{sys_version};    # sprintf "%s using %s", $dbh->{sys_version}, $dtype;
+}
 
 sub get_avail_tables
 {
     my ($dbh) = @_;
-    my @tables = (
-	$dbh->SUPER::get_avail_tables(),
-	$dbh->selectrow_array("SELECT * FROM alltables"),
-    );
+    my @tables = ( $dbh->SUPER::get_avail_tables(), $dbh->selectrow_array("SELECT * FROM alltables"), );
     return @tables;
 }
 
 sub disconnect ($)
 {
-    return $_[0]->SUPER::disconnect ();
+    return $_[0]->SUPER::disconnect();
 }
 
 package DBD::Sys::st;
@@ -139,7 +197,7 @@ use warnings;
 
 use vars qw(@ISA $imp_data_size);
 
-@ISA = qw(DBI::DBD::SqlEngine::st);
+@ISA                         = qw(DBI::DBD::SqlEngine::st);
 $DBD::Sys::st::imp_data_size = 0;
 
 package DBD::Sys::Statement;
@@ -147,71 +205,32 @@ package DBD::Sys::Statement;
 use strict;
 use warnings;
 
-use vars qw(@ISA $imp_data_size);
+use vars qw(@ISA);
 
-@ISA = qw(DBI::DBD::SqlEngine::Statement);
-
-use Carp qw(croak);
 use Scalar::Util qw(weaken);
 
-use Module::Pluggable
-  require     => 1,
-  search_path => ['DBD::Sys::Plugin'],
-  inner       => 0;
-use Params::Util qw(_HASH);
-
-my %tables2classes;
-
-sub new($$)
-{
-    my ( $class, $statement, $parser, $dbh ) = @_;
-    my $self = $class->SUPER::new( $statement, $parser );
-    $self->{dbh} = $dbh;
-    weaken( $self->{dbh} );
-    return $self;
-}
-
-sub initTables2Classes()
-{
-    my $self = $_[0];
-
-    foreach my $plugin ( $self->plugins() )
-    {
-        my %pluginTables = $plugin->getSupportedTables();
-        %tables2classes = ( %tables2classes, map { lc $_ => $pluginTables{$_} } keys %pluginTables );
-    }
-
-    return $self;
-}
-
-sub getTableList()
-{
-    $_[0]->initTables2Classes() unless ( _HASH( \%tables2classes ) );
-    return keys %tables2classes;
-}
-
-sub getTableDetails()
-{
-    $_[0]->initTables2Classes() unless ( _HASH( \%tables2classes ) );
-    return %tables2classes;
-}
+@ISA = qw(DBI::DBD::SqlEngine::Statement);
 
 sub open_table($$$$$)
 {
     my ( $self, $data, $table, $createMode, $lockMode ) = @_;
-    $self->initTables2Classes() unless ( _HASH( \%tables2classes ) );
 
     my $attr_prefix = 'sys_' . lc($table) . '_';
     my $attrs       = {};
-    foreach my $attr ( keys %{ $self->{dbh} } )
+    my $meta        = {};
+    my $dbh         = $data->{Database};
+    foreach my $attr ( keys %{$dbh} )
     {
         next unless ( $attr =~ m/^$attr_prefix(.+)$/ );
-        $attrs->{$1} = $self->{dbh}->{$attr};
+        $meta->{$1} = $dbh->{$attr};
     }
-    my $tblClass = $tables2classes{ lc $table };
-    croak("Specified table '$table' not known") unless ($tblClass);
+    $attrs->{meta}     = $meta;
+    $attrs->{database} = $dbh;
+    $attrs->{owner}    = $self;
+    weaken( $attrs->{owner} );
+    weaken( $attrs->{database} );
 
-    my $tbl = $tblClass->new( $self, $attrs );
+    my $tbl = $dbh->{sys_pluginmgr}->getTable( $table, $attrs );
 
     return $tbl;
 }

@@ -6,10 +6,35 @@ use warnings;
 use vars qw($VERSION);
 
 use Carp qw(croak);
+use Module::Pluggable::Object;
+use Scalar::Util qw(blessed);
 
 $VERSION = "0.02";
 
-sub getSupportedTables { croak "Abstract method 'getSupportedTables' called"; }
+sub getSupportedTables
+{
+    my $self = $_[0];
+    my $proto = blessed($self) || $self;
+    my $finder = Module::Pluggable::Object->new(
+                                                 require     => 1,
+                                                 search_path => [$proto],
+                                                 inner       => 0,
+                                               );
+
+    my %supportedTables;
+    my @tblClasses = $finder->plugins();
+    foreach my $tblClass (@tblClasses)
+    {
+        my $tblName;
+        $tblClass->can('getTableName') and $tblName = $tblClass->getTableName();
+        $tblName or ( ( $tblName = $tblClass ) =~ s/.*::(\p{Word}+)$/$1/ );
+        $supportedTables{$tblName} = $tblClass;
+    }
+
+    return %supportedTables;
+}
+
+sub getPriority { return 1000; }
 
 1;
 
@@ -31,7 +56,7 @@ plugins.
 =head2 Plugin structure
 
 Each plugin must be named C<DBD::Sys::Plugin::>I<Plugin-Name>. This package
-must provide an external callable method named C<getSupportedTables> which
+can provide an external callable method named C<getSupportedTables> which
 must return a hash containing the provided tables as key and the classes which
 implement the tables as associated value, e.g.:
 
@@ -48,9 +73,27 @@ implement the tables as associated value, e.g.:
 
 If the table is located in additional module, it must be required either by
 the plugin package on loading or at least when it's returned by
-C<getSupportedTables>. It's strongly recommended to derive the table classes
-from L<DBD::Sys::Table>, but required is that it provides a constructor named
-C<new> and satisfies the interface of L<SQL::Eval::Table|SQL::Eval>:
+C<getSupportedTables>.
+
+If this method is not provided, the namespace below the plugin name will
+be scanned for tables using L<Module::Pluggable::Object>:
+
+  sub DBD::Sys::Plugin::getSupportedTables
+  {
+      my $proto = blessed($_[0]) || $_[0];
+      my $finder = Module::Pluggable::Object->new(
+						   require     => 1,
+						   search_path => [$proto],
+						   inner       => 0,
+      );
+      my @tableClasses = $finder->plugins();
+      ...
+  }
+
+It's strongly recommended to derive the table classes from
+L<DBD::Sys::Table>, but it's required that it is a
+L<SQL::Eval::Table|SQL::Eval> and provides the C<getColNames> and
+C<collectData> methods:
 
   package DBD::Sys::Plugin::Foo::MyTable;
 
@@ -62,7 +105,7 @@ C<new> and satisfies the interface of L<SQL::Eval::Table|SQL::Eval>:
   {
       # ...
 
-      \@data;
+      return \@data;
   }
 
 =cut

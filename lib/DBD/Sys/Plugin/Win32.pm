@@ -1,4 +1,4 @@
-package DBD::Sys::Plugin::Unix;
+package DBD::Sys::Plugin::Win32;
 
 use strict;
 use warnings;
@@ -9,15 +9,15 @@ use base qw(DBD::Sys::Plugin);
 
 $VERSION = "0.02";
 
-#################### main pod documentation start ###################
+sub getPriority() { return 500; }
 
 =head1 NAME
 
-DBD::Sys::Plugin::Unix - provides tables B<available on Unix and alike systems only>.
+DBD::Sys::Plugin::Win32 - provides tables B<available on Windows only>.
 
 =head1 DESCRIPTION
 
-On Unix and unixoide systems this plugin provides access to following tables:
+On Windows this module provides following tables:
 
 =over 8
 
@@ -33,16 +33,11 @@ Table containing group information
 
 Table containing process information
 
-=item netint
-
-Table containing network interface information.
-
 =back
 
 =head1 PREREQUISITES
 
-This plugin only works on Unix or unixoide systems.
-The module C<Proc::Processtable> is required to run the module C<Procs>.
+This plugin only works on Windows.
 
 =head1 BUGS & LIMITATIONS
 
@@ -79,8 +74,4 @@ preferred freelancer agencies.
 
 =cut
 
-#################### main pod documentation end ###################
-
-sub getPriority() { return 500; }
-
-1;    # every module must end like this
+1;

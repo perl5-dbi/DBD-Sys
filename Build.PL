@@ -9,23 +9,27 @@ my $build = Module::Build->new(
         license           => 'perl',
         build_required    => { 'Test::More' => 0, },
         requires          => {
-                      'DBI'               => '1.605',
+                      'DBI'               => '1.612',
                       'Module::Pluggable' => '3.9',
                       'Params::Util'      => '1.00',
                       'Scalar::Util'      => '1.00',
-                      'SQL::Statement'    => '1.22',
+                      'SQL::Statement'    => '1.28',
                       ( $^O eq 'MSWin32' ? ( 'Win32::pwent' => 0.01, ) : () ),
                     },
         recommends => {
-                        'DBI'            => '1.611',
-                        'SQL::Statement' => '1.27',
+                        'DBI'            => '1.612',
+                        'SQL::Statement' => '1.28',
                       },
         auto_features => {
             filesys_tables => {
                                 description => "Tables containing file system data",
-                                requires    => { 'Sys::Filesystem' => '1.28', },
-                                recommends  => {
-                                                'Filesys::DfPortable' => '0.83',
+                                requires    => {
+                                              'Sys::Filesystem'     => '1.0',
+                                              'Filesys::DfPortable' => '0.83',
+                                            },
+                                recommends => {
+                                                'Sys::Filesystem'     => '1.29',
+                                                'Filesys::DfPortable' => '0.85',
                                                 ( $^O eq 'MSWin32' ? ( 'Win32::DriveInfo' => 0.06, ) : () ),
                                               },
                               },

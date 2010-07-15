@@ -3,6 +3,9 @@ package DBD::Sys::Plugin::Meta;
 use strict;
 use warnings;
 
+use vars qw($VERSION);
+$VERSION = 0.02;
+
 #################### main pod documentation start ###################
 
 =head1 NAME
@@ -17,33 +20,8 @@ Provided tables:
 
 =item alltables
 
-Table containing the list of available tables.
-
-Columns:
-
-=over 12
-
-=item table_qualifier
-
-Unused, I<NULL>.
-
-=item table_owner
-
-Unused, I<NULL>
-
-=item table_name
-
-Name of the table
-
-=item table_type
-
-Class name of the table implementation
-
-=item remarks
-
-Unused, I<NULL>
-
-=back
+Table containing the list of available tables. See
+L<DBD::Sys::Plugin::Meta::AllTables> for details.
 
 =back
 
@@ -58,7 +36,7 @@ No known bugs at this moment.
     Jens Rehsack			Alexander Breibach
     CPAN ID: REHSACK
     rehsack@cpan.org			alexander.breibach@googlemail.com
-    http://www.rehsack.de/		http://...
+    http://www.rehsack.de/
 
 =head1 COPYRIGHT
 
@@ -82,33 +60,12 @@ preferred freelancer agencies.
 
 #################### main pod documentation end ###################
 
+require DBD::Sys::Plugin::Meta::AllTables;
+
 my %supportedTables = ( alltables => 'DBD::Sys::Plugin::Meta::AllTables', );
 
 sub getSupportedTables() { %supportedTables }
 
-package DBD::Sys::Plugin::Meta::AllTables;
-
-use strict;
-use warnings;
-use vars qw(@colNames);
-
-use base qw(DBD::Sys::Table);
-
-@colNames = qw(table_qualifier table_owner table_name table_type remarks);
-
-sub getColNames() { @colNames }
-
-sub collect_data()
-{
-    my @data;
-    my %tables = $_[0]->{owner}->getTableDetails();
-
-    while ( my ( $table, $class ) = each(%tables) )
-    {
-        push( @data, [ undef, undef, $table, 'TABLE', $class ] );
-    }
-
-    return \@data;
-}
+sub getPriority { return 200; }
 
 1;

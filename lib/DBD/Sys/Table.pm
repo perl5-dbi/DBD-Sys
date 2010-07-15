@@ -4,34 +4,52 @@ use strict;
 use warnings;
 use vars qw(@ISA $VERSION);
 
+use Carp qw(croak);
+use Scalar::Util qw(blessed);
+
 require SQL::Eval;
 require DBI::DBD::SqlEngine;
-use Scalar::Util qw(weaken);
 
-@ISA = qw(DBI::DBD::SqlEngine::Table);
+@ISA     = qw(DBI::DBD::SqlEngine::Table);
 $VERSION = 0.02;
+
+sub getColNames() { croak "Abstract method 'getColNames' called"; }
+sub collectData() { croak "Abstract method 'collectData' called"; }
+
+sub getPrimaryKey() { return ( $_[0]->getColNames() )[0]; }
+
+sub getPriority()
+{
+    my $self = $_[0];
+    my $proto = blessed($self) || $self;
+    ( my $plugin = $proto ) =~ s/(.*)::\p{Word}+$/$1/;
+    return $plugin->getPriority();
+}
 
 sub new
 {
-    my ( $className, $owner, $attrs ) = @_;
+    my ( $className, $attrs ) = @_;
     my %table = (
-                  col_names => [ $className->getColNames() ],
-                  pos       => 0,
-                  owner     => $owner,
-                  attrs     => $attrs,
+                  pos => 0,
+                  %$attrs,
                 );
+    exists $table{col_names}
+      or $table{col_names} = [ $className->getColNames() ];
 
     my $self = $className->SUPER::new( \%table );
 
-    weaken( $self->{owner} );
-
-    $self->{data} = $self->collect_data();
+    $self->{data} = $self->collectData();
 
     return $self;
 }
 
 sub fetch_row
 {
+    unless(blessed($_[0]))
+    {
+	my @caller = caller();
+	die "Invalid invocation on unblessed '$_[0]' from $caller[0] at $caller[2] in $caller[1]";
+    }
     $_[0]->{row} = undef;
     if ( $_[0]->{pos} < scalar( @{ $_[0]->{data} } ) )
     {
@@ -50,7 +68,7 @@ DBD::Sys::Table - abstract base class of tables used in DBD::Sys
 =head1 ISA
 
   DBD::Sys::Table
-  ISA SQL::Eval::Table
+  ISA DBI::DBD::SqlEngine::Table
 
 =head1 DESCRIPTION
 
@@ -63,9 +81,10 @@ of SQL::Statement on a table around the pure data collecting actions.
 
 =item new
 
-Constructor - called from C<DBD::Sys::Statement::open_table> when called
-from C<SQL::Statement::opentables>. The constructor is always invoked with
-the owning statement instance as first argument.
+Constructor - called from C<DBD::Sys::PluginManager::getTable> when called
+from C<SQL::Statement::open_tables> for tables with one implementor class.
+The C<$attrs> argument contains the owner statement instance in the field
+C<owner> and the owning database handle in the field <database>.
 
 =item fetch_row
 
@@ -84,10 +103,15 @@ This method is called during the construction phase of the table. It must be
 a I<static> method - the called context is the class name of the constructed
 object.
 
-=item collect_data
+=item collectData
 
 This method is called when the table is constructed but before the first row
 shall be delivered via C<fetch_row()>.
+
+=item getPrimaryKey
+
+This method returns the column name of the primary key column. If not
+overwritten, the first column name is returned by C<DBD::Sys::Table>.
 
 =back
 
