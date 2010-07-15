@@ -22,36 +22,41 @@ sub new
       sort { ( $a->getPriority() <=> $b->getPriority() ) || ( blessed($a) cmp blessed($b) ) } @$tableInfo;
 
     my $compositeName = join( "-", @tableClasses );
-    my ( @embed, %allColNames, @allColNames, %mergeCols, $primaryKey );
+    my ( @embed, %allColNames, @allColNames, $allColIdx, %mergeCols, %enhanceCols, $primaryKey );
+    $allColIdx = 0;
     foreach my $tblClass (@tableClasses)
     {
-	my %embedAttrs = %$attrs;
-        my $embedded = $tblClass->new( \%embedAttrs );
+        my %embedAttrs = %$attrs;
+        my $embedded   = $tblClass->new( \%embedAttrs );
         push( @embed, $embedded );
         next if ( defined( $compositedInfo{$compositeName} ) );
 
         my @embedColNames = $embedded->getColNames();
-        if (@allColNames)
+        if ($allColIdx)
         {
             my $embedPK = $embedded->getPrimaryKey();
             $primaryKey eq $embedPK
               or croak( "Primary key ($embedPK) of '$tblClass' differs from primary key ($primaryKey) of "
                         . join( ", ", keys %mergeCols ) );
-	    $mergeCols{$tblClass} = [];
+            $mergeCols{$tblClass} = [];
             foreach my $colIdx ( 0 .. $#embedColNames )
             {
                 my $colName = $embedColNames[$colIdx];
-                unless ( exists( $allColNames{$colName} ) )
+                if ( exists( $allColNames{$colName} ) )
+                {
+                    $enhanceCols{$tblClass}->{ $allColNames{$colName} } = $colIdx;
+                }
+                else
                 {
                     push( @allColNames,               $colName );
                     push( @{ $mergeCols{$tblClass} }, $colIdx );
-                    $allColNames{$colName} = 1;
+                    $allColNames{$colName} = $allColIdx++;
                 }
             }
         }
         else
         {
-            %allColNames          = map { $_ => 1 } @embedColNames;
+            %allColNames          = map { $_ => $allColIdx++ } @embedColNames;
             @allColNames          = @embedColNames;
             $mergeCols{$tblClass} = [ 0 .. $#embedColNames ];
             $primaryKey           = $embedded->getPrimaryKey();
@@ -60,15 +65,18 @@ sub new
 
     defined( $compositedInfo{$compositeName} )
       or $compositedInfo{$compositeName} = {
-                                             col_names  => \@allColNames,
-                                             merge_cols => \%mergeCols,
+                                             col_names    => \@allColNames,
+                                             primary_key  => $primaryKey,
+                                             merge_cols   => \%mergeCols,
+                                             enhance_cols => \%enhanceCols,
                                            };
 
     $attrs->{meta} = {
                        composite_name => $compositeName,
-                       primary_key    => $primaryKey,
                        embed          => \@embed,
+                       primary_key    => $compositedInfo{$compositeName}->{primary_key},
                        merge_cols     => $compositedInfo{$compositeName}->{merge_cols},
+                       enhance_cols   => $compositedInfo{$compositeName}->{enhance_cols},
                      };
     $attrs->{col_names} = clone( $compositedInfo{$compositeName}->{col_names} );
 
@@ -87,20 +95,41 @@ sub collectData
 
     my $meta          = $self->{meta};
     my $compositeName = $meta->{composite_name};
+    my $rowOffset     = 0;
     foreach my $embedded ( @{ $meta->{embed} } )
     {
-        my $pkIdx     = $embedded->column_num( $meta->{primary_key} );
-        my $mergeCols = $meta->{merge_cols}->{ blessed($embedded) };
+        my $nextRowOffset;
+        my $pkIdx       = $embedded->column_num( $meta->{primary_key} );
+        my $mergeCols   = $meta->{merge_cols}->{ blessed($embedded) };
+        my $enhanceCols = $meta->{enhance_cols}->{ blessed($embedded) };
         while ( my $row = $embedded->fetch_row() )
         {
+            $nextRowOffset ||= $rowOffset + scalar(@$mergeCols);
             my $pk = $row->[$pkIdx];
             if ( $data{$pk} )
             {
-                push( @{ $data{$pk} }, @$row[@$mergeCols] );
+                if ( scalar( @{ $data{$pk} } ) == $nextRowOffset )
+                {
+                    warn "primary key '" . $meta->{primary_key} . "' is not unique for " . blessed($embedded);
+                }
+                else
+                {
+                    push( @{ $data{$pk} }, @$row[@$mergeCols] );
+                }
             }
             else
             {
-                $data{$pk} = [@$row];
+                if ( 0 == $rowOffset )
+                {
+                    $data{$pk} = [@$row];
+                }
+                else
+                {
+                    my @entry = (undef) x $rowOffset;
+                    @entry[ keys %{$enhanceCols} ] = @$row[ values %{$enhanceCols} ];
+                    push( @entry, @$row[@$mergeCols] );
+                    $data{$pk} = \@entry;
+                }
             }
         }
     }
