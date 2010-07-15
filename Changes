@@ -6,6 +6,7 @@ Revision history for Perl module DBD::Sys
 	* allow multiple implementors for one table
 	* merge the data from multiple implementors on primary key
     - rely on DBI::DBD::SqlEngine
+    - add support for Win32::Process::Info
 
 0.01 2010-05-14
     - original version; released to an unsuspecting world ...
