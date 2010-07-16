@@ -14,7 +14,7 @@ eval {
     $haveNetInterface = 1;
 };
 
-if ($haveNetInterface) { import Net::Interface; }
+Net::Interface->import() if ($haveNetInterface);
 
 @colNames = qw(interface address_family address netmask broadcast hwadress flags_bin flags mtu metric);
 
@@ -53,13 +53,13 @@ sub collectData()
         {
             my $if    = $hvp->info();
             my $flags = getflags( $if->{flags} );
-            unless ( defined $if->{flags} && $if->{flags} & IFF_UP() )    # no flags found
+            unless ( defined $if->{flags} && $if->{flags} & Net::Interface::IFF_UP() )    # no flags found
             {
                 push( @data, [ $if->{name}, undef, undef, undef, undef, undef, $if->{flags}, $flags, undef, undef, ] );
             }
             else                                                          # flags found
             {
-                my $mac    = ( defined $if->{mac} )    ? "\n\tMAC: " . mac_bin2hex( $if->{mac} ) : '';
+                my $mac    = ( defined $if->{mac} )    ? "\n\tMAC: " . Net::Interface::mac_bin2hex( $if->{mac} ) : '';
                 my $mtu    = $if->{mtu}                ? 'MTU:' . $if->{mtu}                     : '';
                 my $metric = ( defined $if->{metric} ) ? 'Metric:' . $if->{metric}               : '';
 
