@@ -28,8 +28,9 @@ else
 my $found = 0;
 
 ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect 1' );
-ok( $st = $dbh->prepare("SELECT COUNT(uid) FROM procs WHERE procs.uid=$<"), 'prepare process' )
-  ;    # $< refers to the current user (Hello, it's me ;-))
+
+# $< refers to the current user (Hello, it's me ;-))
+ok( $st = $dbh->prepare("SELECT COUNT(uid) FROM procs WHERE procs.uid=$<"), 'prepare process' );
 ok( my $num = $st->execute(), 'execute process' );
 SKIP:
 {
