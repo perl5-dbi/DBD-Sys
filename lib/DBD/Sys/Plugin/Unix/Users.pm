@@ -12,37 +12,22 @@ $VERSION  = "0.02";
 sub getTableName() { return 'pwent'; }
 sub getColNames()  { @colNames }
 
-my @pwentcache;
 my $havepwent = 0;
 
-if ( $^O eq 'freebsd' )
-{
-    while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = getpwent() )
-    {
-        push( @pwentcache, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
-    }
-    endpwent();
-}
-else
-{
-    eval { endpwent(); my @pwentry = getpwent(); endpwent(); $havepwent = 1; };
-}
+eval { setpwent(); my @pwentry = getpwent(); endpwent(); $havepwent = 1; };
 
 sub collectData()
 {
     my @data;
 
-    if (@pwentcache)
+    if ($havepwent)
     {
-        @data = @pwentcache;
-    }
-    elsif ($havepwent)
-    {
-        endpwent();    # ensure we're starting fresh ...
+        setpwent();    # rewind to ensure we're starting fresh ...
         while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = getpwent() )
         {
             push( @data, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
         }
+	setpwent();
         endpwent();
     }
 

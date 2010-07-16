@@ -17,33 +17,19 @@ eval { endgrent(); my @grentry = getgrent(); endgrent(); $havegrent = 1; };
 
 sub collectData()
 {
-    my %data;
+    my @data;
 
     if ($havegrent)
     {
-        endgrent();    # ensure we're starting fresh ...
+        setgrent();    # rewind to ensure we're starting fresh ...
         while ( my ( $name, $grpass, $gid, $members ) = getgrent() )
         {
-            if ( defined( $data{$name} ) )    # FBSD seems to have a bug with multiple entries
-            {
-                my $row = $data{$name};
-                unless (     ( $row->[0] eq $name )
-                         and ( $row->[1] eq $grpass )
-                         and ( $row->[2] == $gid )
-                         and ( $row->[3] eq $members ) )
-                {
-                    warn "$name is delivered more than once and the group information differs from the first one";
-                }
-            }
-            else
-            {
-                $data{$name} = [ $name, $grpass, $gid, $members ];
-            }
+	    push(@data, [ $name, $grpass, $gid, $members ]);
         }
+	setgrent(); # rewind
         endgrent();
     }
 
-    my @data = values %data;
     return \@data;
 }
 
