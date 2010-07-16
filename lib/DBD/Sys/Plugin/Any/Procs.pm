@@ -35,7 +35,9 @@ sub _init_knownCols
         %knownCols = map {
             defined $colMap{$_} or $colMap{$_} = $_;
             my $fn = $colMap{$_};
-            $_ => ( eval { $table->[0]->$fn() } || 0 )
+	    $@ = undef;
+	    eval { $table->[0]->$fn() };
+            $_ => ( $@ ? 0 : 1)
         } @colNames;
     }
 }
