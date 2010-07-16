@@ -7,6 +7,9 @@ Revision history for Perl module DBD::Sys
 	* merge the data from multiple implementors on primary key
     - rely on DBI::DBD::SqlEngine
     - add support for Win32::Process::Info
+    - fix DBD::Sys::Plugin::Unix::Users and DBD::Sys::Plugin::Unix::Groups
+      using setpwent/setgrent as recommended by
+      Ashish SHUKLA <ashish@freebsd.org> (and by Richard W. Stevens)
 
 0.01 2010-05-14
     - original version; released to an unsuspecting world ...
