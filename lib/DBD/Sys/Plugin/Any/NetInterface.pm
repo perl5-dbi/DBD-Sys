@@ -23,8 +23,8 @@ sub getColNames()   { @colNames }
 sub getPrimaryKey() { return 'address'; }
 
 $haveNetInterface and *getflags = sub {
-    my $flags = $_[0] // 0;
-    my $txt = ( $flags & eval ' Net::Interface::IFF_UP ' ) ? '<up' : '<down';
+    my $flags = $_[0] || 0;
+    my $txt = ( $flags & Net::Interface::IFF_UP() ? '<up' : '<down';
     foreach my $iffname ( sort @{ $Net::Interface::EXPORT_TAGS{iffs} } )
     {
         no strict;
