@@ -10,6 +10,7 @@ Revision history for Perl module DBD::Sys
     - fix DBD::Sys::Plugin::Unix::Users and DBD::Sys::Plugin::Unix::Groups
       using setpwent/setgrent as recommended by
       Ashish SHUKLA <ashish@freebsd.org> (and by Richard W. Stevens)
+    - add logins table to get a list of logged in users
 
 0.01 2010-05-14
     - original version; released to an unsuspecting world ...
