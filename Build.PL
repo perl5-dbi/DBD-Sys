@@ -28,7 +28,7 @@ my $build = Module::Build->new(
                                               'Filesys::DfPortable' => '0.83',
                                             },
                                 recommends => {
-                                                'Sys::Filesystem'     => '1.29',
+                                                'Sys::Filesystem'     => '1.30',
                                                 'Filesys::DfPortable' => '0.85',
                                                 ( $^O eq 'MSWin32' ? ( 'Win32::DriveInfo' => 0.06, ) : () ),
                                               },
@@ -37,6 +37,7 @@ my $build = Module::Build->new(
                 description => "Tables containing process information",
                 requires =>
                   { ( $^O eq 'MSWin32' ? ( 'Win32::Process::Info' => 1.015, ) : ( 'Proc::ProcessTable' => '0.45' ) ), },
+                recommends => { ( $^O eq 'MSWin32' ? ( 'Win32::Process::CommandLine' => 0, ) : () ), },
             },
             network_tables => {
                                 description => "Tables containing network information",
@@ -46,7 +47,22 @@ my $build = Module::Build->new(
                                             },
                                 recommends => { 'Net::Interface' => '1.0012', },
                               },
-                         },
+            (
+              $^O ne 'MSWin32'
+              ? (
+                  login_table => {
+                                   description => "Table containing logged on users",
+                                   requires    => { 'Sys::Utmp' => '1.6', },
+                                 },
+                  openfiles_table => {
+                                       description => "Table containing open files",
+                                       requires    => { 'Unix::Lsof' => '0.0.9', },
+                                       recommends  => { 'Sys::Filesystem::MountPoint' => '1.02', },
+                                     },
+                )
+              : ()
+            ),
+        },
         create_makefile_pl => 'traditional',
 );
 $build->create_build_script;
