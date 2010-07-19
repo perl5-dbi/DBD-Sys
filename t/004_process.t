@@ -11,6 +11,10 @@ plan( tests => 8 );
 
 my $table;
 
+my $found = 0;
+
+ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect 1' );
+
 if ($have_proc_processtable)
 {
     my $pt = Proc::ProcessTable->new();
@@ -18,16 +22,13 @@ if ($have_proc_processtable)
 }
 elsif ($have_win32_proc_info)
 {
+    Win32::Process::Info->import('NT','WMI');
     $table = [ Win32::Process::Info->new()->GetProcInfo() ];
 }
 else
 {
     $table = [];
 }
-
-my $found = 0;
-
-ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect 1' );
 
 # $< refers to the current user (Hello, it's me ;-))
 ok( $st = $dbh->prepare("SELECT COUNT(uid) FROM procs WHERE procs.uid=$<"), 'prepare process' );
@@ -36,6 +37,7 @@ SKIP:
 {
     skip( "OS seems to be unsupported", 1 ) unless scalar(@$table) > 0;
     $row = $st->fetchrow_arrayref();
+    local $TODO = "Needs to be approved for MSWin32" if $^O eq "MSWin32";
     ok( $row->[0], 'process found for current user' );
 }
 
@@ -52,6 +54,7 @@ SKIP:
 {
     skip( "OS seems to be unsupported", 1 ) unless scalar(@$table) > 0;
     $row = $st->fetchrow_arrayref();    # arrayref BECAUSE hash needs keys (eg. ColumnNames) and array just counts.
+    local $TODO = "Needs to be approved for MSWin32" if $^O eq "MSWin32";
     ok( $row->[0], 'process found for every user' )
       ;                                 # $row[0] refers to the first column of the array...here it's the number
 }
