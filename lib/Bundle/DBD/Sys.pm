@@ -19,9 +19,9 @@ C<perl -MCPAN -e 'install Bundle::DBD::Sys'>
 
 =head1 CONTENTS
 
-DBI 1.02
+DBI 1.612
 
-SQL::Statement 1.21
+SQL::Statement 1.28
 
 =head1 DESCRIPTION
 

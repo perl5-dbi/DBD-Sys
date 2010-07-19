@@ -9,31 +9,46 @@ use base qw(DBD::Sys::Plugin);
 
 $VERSION = "0.02";
 
-#################### main pod documentation start ###################
-
 =head1 NAME
 
-DBD::Sys::Plugin::Unix - provides tables B<available on Unix and alike systems only>.
+DBD::Sys::Plugin::Unix - provides tables B<available on Unix and alike environments only>.
+
+=head1 ISA
+
+  DBD::Sys::Plugin::Unix
+  ISA DBD::Sys::Plugin
 
 =head1 DESCRIPTION
 
-On Unix and unixoide systems this plugin provides access to following tables:
+This plugin manages the tables for any UNIX and unixoide operating
+environment.  The tables provided from here are expected to work on any
+UNIX compatible operating system (beside bugs).
 
-=over 8
+=head2 TABLES
 
-=item pwent
+=head3 pwent
 
-Table containing user information.
+Table containing user information. See L<DBD::Sys::Plugin::Unix::Users>
+for details.
 
-=item grent
+=head3 grent
 
-Table containing group information
+Table containing group information. See L<DBD::Sys::Plugin::Unix::Groups>
+for details.
 
-=back
+=head1 METHODS
+
+=head2 getPriority
+
+Returns the default priority for unix tables, 500.
+
+=cut
+
+sub getPriority() { return 500; }
 
 =head1 PREREQUISITES
 
-This plugin only works on Unix or unixoide systems.
+This plugin only works on Unix or unixoide environments.
 
 =head1 BUGS & LIMITATIONS
 
@@ -44,7 +59,7 @@ No known bugs at this moment.
     Jens Rehsack			Alexander Breibach
     CPAN ID: REHSACK
     rehsack@cpan.org			alexander.breibach@googlemail.com
-    http://www.rehsack.de/		http://...
+    http://www.rehsack.de/
 
 =head1 COPYRIGHT
 
@@ -57,17 +72,14 @@ LICENSE file included with this module.
 =head1 SUPPORT
 
 Free support can be requested via regular CPAN bug-tracking system. There is
-no guaranteed reaction time or solution time. It depends on business load.
+no guaranteed reaction time or solution time, but it's always tried to give
+accept or reject a reported ticket within a week. It depends on business load.
 That doesn't mean that ticket via rt aren't handles as soon as possible,
 that means that soon depends on how much I have to do.
 
-Business and commercial support should be aquired from the authors via
+Business and commercial support should be acquired from the authors via
 preferred freelancer agencies.
 
 =cut
-
-#################### main pod documentation end ###################
-
-sub getPriority() { return 500; }
 
 1;    # every module must end like this

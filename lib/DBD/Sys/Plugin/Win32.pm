@@ -9,31 +9,46 @@ use base qw(DBD::Sys::Plugin);
 
 $VERSION = "0.02";
 
-sub getPriority() { return 500; }
-
 =head1 NAME
 
 DBD::Sys::Plugin::Win32 - provides tables B<available on Windows only>.
 
+=head1 ISA
+
+  DBD::Sys::Plugin::Win32
+  ISA DBD::Sys::Plugin
+
 =head1 DESCRIPTION
 
-On Windows this module provides following tables:
+This plugin manages the tables for any MSWin32 compatible operating
+system.
 
-=over 8
+=head2 TABLES
 
-=item pwent
+=head3 pwent
 
-Table containing user information.
+Table containing user information. See L<DBD::Sys::Plugin::Win32::Users>
+for details.
 
-=item grent
+=head3 grent
 
-Table containing group information
+Table containing group information. See L<DBD::Sys::Plugin::Win32::Groups>
+for details.
 
-=item procs
+=head3 procs
 
-Table containing process information
+Table containing process information. See L<DBD::Sys::Plugin::Win32::Procs>
+for details.
 
-=back
+=head1 METHODS
+
+=head2 getPriority
+
+Returns the default priority for win32 tables, 500.
+
+=cut
+
+sub getPriority() { return 500; }
 
 =head1 PREREQUISITES
 
@@ -52,7 +67,7 @@ and needs help porting from autoconf to hints framework.
     Jens Rehsack			Alexander Breibach
     CPAN ID: REHSACK
     rehsack@cpan.org			alexander.breibach@googlemail.com
-    http://www.rehsack.de/		http://...
+    http://www.rehsack.de/
 
 =head1 COPYRIGHT
 
@@ -65,11 +80,12 @@ LICENSE file included with this module.
 =head1 SUPPORT
 
 Free support can be requested via regular CPAN bug-tracking system. There is
-no guaranteed reaction time or solution time. It depends on business load.
+no guaranteed reaction time or solution time, but it's always tried to give
+accept or reject a reported ticket within a week. It depends on business load.
 That doesn't mean that ticket via rt aren't handles as soon as possible,
 that means that soon depends on how much I have to do.
 
-Business and commercial support should be aquired from the authors via
+Business and commercial support should be acquired from the authors via
 preferred freelancer agencies.
 
 =cut

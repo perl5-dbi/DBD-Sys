@@ -12,6 +12,135 @@ use Clone qw(clone);
 @ISA     = qw(DBD::Sys::Table);
 $VERSION = "0.02";
 
+=pod
+
+=head1 NAME
+
+DBD::Sys::CompositeTable - Table implementation to compose different sources into one table
+
+=head1 ISA
+
+  DBD::Sys::CompositeTable
+  ISA DBD::Sys::Table
+    ISA DBI::DBD::SqlEngine::Table
+
+=head1 DESCRIPTION
+
+DBD::Sys::CompositeTable provides a table which composes the data from
+several sources in one data table.
+
+While constructing this table, the columns of the embedded tables are
+collected and a heading and a merge plan for the composed result table
+is generated.
+
+Simplified example of table procs:
+
+  $alltables = $dbh->selectall_hashref("select * from procs", "pid");
+
+  # calls
+  # DBD::Sys::CompositeTable( [ 'DBD::Sys::Plugin::Any::Procs',
+  #                             'DBD::Sys::Plugin::Win32::Procs' ],
+  #                           $attr );
+
+This will fetch the column names from both embedded tables and get (simplfied):
+
+  # %colNames = (
+  #     'DBD::Sys::Plugin::Any::Procs' => [
+  #       'pid', 'ppid', 'uid', 'gid', 'cmndline', 'sess', 'priority', 'ttynum', 'start', 'run', 'status',
+  #     ],
+  #     'DBD::Sys::Plugin::Win32::Procs' => [
+  #       'pid', 'ppid', 'uid', 'gid', 'cmndline', 'sess', 'priority', 'thread', 'start', 'run', 'status',
+  #     ]
+  # );
+  # @colNames = (
+  #       'pid', 'ppid', 'uid', 'gid', 'cmndline', 'sess', 'priority', 'ttynum', 'start', 'run', 'status', 'threads',
+  # );
+  # %mergeCols = (
+  #     'DBD::Sys::Plugin::Any::Procs' => [
+  #         0 .. 10,
+  #     ],
+  #     'DBD::Sys::Plugin::Win32::Procs' => [
+  #         7,
+  #     ]
+  # );
+  # $primaryKey = 'pid';
+
+The merge phase in C<collectData()> finally does (let's assume running
+in a cygwin environment, where Proc::ProcessTable and Win32::Process::Info
+both are working):
+
+  +-----+------+-----+-----+----------+------+----------+---------+-------+-----+---------+
+  | pid | ppid | uid | gid | cmndline | sess | priority |  ttynum | start | run | status  |
+  +-----+------+-----+-----+----------+------+----------+---------+-------+-----+---------+
+  |   0 |    0 |   0 |   0 | 'init'   |    0 |        4 | <undef> |     0 | 999 | 'ioblk' |
+  | 100 |    0 | 200 |  20 | 'bash'   |    1 |        8 |   pty/1 | 10000 | 200 | 'wait'  |
+  +-----+------+-----+-----+----------+------+----------+---------+-------+-----+---------+
+
+  +-----+------+-----+-----+----------+------+----------+-------+-----+---------+---------+
+  | pid | ppid | uid | gid | cmndline | sess | priority | start | run | status  | threads |
+  +-----+------+-----+-----+----------+------+----------+-------+-----+---------+---------+
+  | 782 |  241 | 501 | 501 | 'cygwin' |    0 |        4 |     0 | 999 | 'ioblk' |       2 |
+  | 100 |    0 | 501 | 501 | 'bash'   |    1 |        8 | 10000 | 200 | 'wait'  |       8 |
+  +-----+------+-----+-----+----------+------+----------+-------+-----+---------+---------+
+
+The resulting table would be:
+
+  +-----+------+-----+-----+----------+------+----------+---------+-------+-----+---------+---------+
+  | pid | ppid | uid | gid | cmndline | sess | priority |  ttynum | start | run | status  | threads |
+  +-----+------+-----+-----+----------+------+----------+---------+-------+-----+---------+---------+
+  |   0 |    0 |   0 |   0 | 'init'   |    0 |        4 | <undef> |     0 | 999 | 'ioblk' | <undef> |
+  | 100 |    0 | 200 |  20 | 'bash'   |    1 |        8 |   pty/1 | 10000 | 200 | 'wait'  |       8 |
+  | 782 |  241 | 501 | 501 | 'cygwin' |    0 |        4 | <undef> |     0 | 999 | 'ioblk' |       8 |
+  +-----+------+-----+-----+----------+------+----------+---------+-------+-----+---------+---------+
+
+In the real world, it's a bit more complicated and especially the process
+table is a bit larger, but it illustrates the most important points:
+
+=over 4
+
+=item *
+
+missing columns are attached right
+
+=item *
+
+missing rows are appended at the end of the first table (and are
+constructed as good as possible from the data we have)
+
+=item *
+
+once existing data are neither verified nor overwritten (see the difference
+in the cygwin uid (root => uid 0) and win32 uid (Administrator => uid 501).
+
+=back
+
+This is a fictive example - it's not verified how DBD::Sys behaves in
+I<cygwin>! Maybe the user mapping works fine - maybe there will be no
+problem at all. Maybe you will get duplicated lines for each process
+with completely different data.
+
+This is an experimental feature. Use with caution!
+
+=head1 METHODS
+
+=head2 new
+
+  sub new( $proto, $tableInfo, $attrs ) { ... }
+
+Creates a new composite table based on the tables in C<$tableInfo>,
+analyses the result view and create a merge plan for extending rows and
+appending rows.
+
+The order of the embedded tables is primarily influenced by the priority
+of the table and secondarily by the alphabetic order of their package
+names.
+
+In L</DESCRIPTION|above> example, C<DBD::Sys::Plugin::Any::Procs> has
+a priority of 100 and C<DBD::Sys::Plugin::Win32::Procs> has a priority
+of 500. So C<D::S::P::Any::Procs> dominates.
+
+=cut
+
 my %compositedInfo;
 
 sub new
@@ -83,10 +212,28 @@ sub new
     return $proto->SUPER::new($attrs);
 }
 
+=head2 getColNames
+
+This method is called during the construction phase of the table. It must be
+a I<static> method - the called context is the class name of the constructed
+object.
+
+=cut
+
 sub getColNames
 {
     return @{ $_[0]->{col_names} };
 }
+
+=head2 collectData
+
+Merges the collected data by the embedded tables into one composed list
+of rows. This list of rows will be delivered to C<SQL::Statement> when
+C<fetch_row> is called.
+
+The merge phase is demonstrated in the example in L</DESCRIPTION>.
+
+=cut
 
 sub collectData
 {
@@ -139,63 +286,12 @@ sub collectData
     return \@data;
 }
 
-=pod
-
-=head1 NAME
-
-DBD::Sys::CompositeTable - Table implementation to compose different sources into one table
-
-=head1 ISA
-
-  DBD::Sys::CompositeTable
-  ISA DBD::Sys::Table
-    ISA DBI::DBD::SqlEngine::Table
-
-=head1 DESCRIPTION
-
-DBD::Sys::CompositeTable provides a composite for tables which can
-have different sources (e.g. table C<procs> can fetch data from
-a later version of L<Proc::ProcessTable> and L<Win32::Process::Info>).
-
-=head2 Methods of DBD::Sys::Table
-
-=over 8
-
-=item new
-
-Constructor - called from C<DBD::Sys::PluginManager::getTable> when
-C<getTable()> is called for a table which has multiple implementors.
-
-=item fetch_row
-
-Called by C<SQL::Statement> to fetch the single rows. This method return the
-rows contained in the C<data> attribute of the individual instance.
-
-=back
-
-=head2 Methods provided by derived classes
-
-=over 8
-
-=item getColNames
-
-This method is called during the construction phase of the table. It must be
-a I<static> method - the called context is the class name of the constructed
-object.
-
-=item collect_data
-
-This method is called when the table is constructed but before the first row
-shall be delivered via C<fetch_row()>.
-
-=back
-
 =head1 AUTHOR
 
-    Jens Rehsack			Alexander Breibach
+    Jens Rehsack
     CPAN ID: REHSACK
-    rehsack@cpan.org			alexander.breibach@googlemail.com
-    http://www.rehsack.de/		http://...
+    rehsack@cpan.org
+    http://search.cpan.org/~rehsack/
 
 =head1 COPYRIGHT
 
@@ -208,11 +304,12 @@ LICENSE file included with this module.
 =head1 SUPPORT
 
 Free support can be requested via regular CPAN bug-tracking system. There is
-no guaranteed reaction time or solution time. It depends on business load.
+no guaranteed reaction time or solution time, but it's always tried to give
+accept or reject a reported ticket within a week. It depends on business load.
 That doesn't mean that ticket via rt aren't handles as soon as possible,
 that means that soon depends on how much I have to do.
 
-Business and commercial support should be aquired from the authors via
+Business and commercial support should be acquired from the authors via
 preferred freelancer agencies.
 
 =head1 SEE ALSO

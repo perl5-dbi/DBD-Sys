@@ -6,6 +6,23 @@ use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
+=pod
+
+=head1 NAME
+
+DBD::Sys::Plugin::Any::Procs - provides a table containing running processes
+
+=head1 SYNOPSIS
+
+  $processes = $dbh->selectall_hashref("select * from procs", "pid");
+
+=head1 ISA
+
+  DBD::Sys::Plugin::Any::Procs
+  ISA DBD::Sys::Table
+
+=cut
+
 $VERSION = "0.02";
 @colNames =
   qw(uid gid euid egid pid ppid pgrp sess priority ttynum flags fulltime ctime virtsize rss wchan fname start pctcpu state pctmem cmndline ttydev);
@@ -19,7 +36,141 @@ eval {
 
 my %knownCols;
 
-sub getColNames()   { @colNames }
+=head1 DESCRIPTION
+
+This module provides the table C<procs> for any operating system (which is
+supported by Proc::ProcessTable).
+
+=head2 COLUMNS
+
+=head3 uid
+
+UID of process
+
+=head3 gid
+
+GID of process
+ 
+=head3 euid
+
+Effective UID of process
+
+=head3 egid
+
+Effective GID of process
+
+=head3 pid
+
+Process ID
+ 
+=head3 ppid
+
+Parent process ID
+ 
+=head3 pgrp
+
+Process group
+ 
+=head3 sess
+
+Session ID
+
+=head3 cpuid
+
+CPU ID of processor running on        # FIX ME!
+ 
+=head3 priority
+
+Priority of process
+ 
+=head3 ttynum
+
+TTY number of process
+ 
+=head3 flags
+
+Flags of process
+ 
+=head3 fulltime
+
+User + system time
+ 
+=head3 ctime
+
+Child user + system time
+ 
+=head3 timensec
+
+User + system nanoseconds part        # FIX ME!
+ 
+=head3 ctimensec
+
+Child user + system nanoseconds       # FIX ME!
+ 
+=head3 qtime
+
+Cumulative cpu time                   # FIX ME!
+ 
+=head3 virtsize
+
+Virtual memory size (bytes)
+ 
+=head3 rss
+
+Resident set size (bytes)
+ 
+=head3 wchan
+
+Address of current system call
+ 
+=head3 fname
+
+File name
+ 
+=head3 start
+
+Start time (seconds since the epoch)
+ 
+=head3 pctcpu
+
+Percent cpu used since process started
+ 
+=head3 state
+
+State of process
+ 
+=head3 pctmem
+
+Percent memory
+ 
+=head3 cmndline
+
+Full command line of process
+ 
+=head3 ttydev
+
+Path of process's tty
+ 
+=head3 clname
+
+Scheduling class name                 #FIX ME!
+
+=head1 METHODS
+
+=head2 getColNames
+
+Returns the column names of the table as named in L</Columns>
+
+=cut
+
+sub getColNames() { @colNames }
+
+=head2 getPrimaryKey
+
+Returns 'pid' - which is the process identifier.
+
+=cut
+
 sub getPrimaryKey() { return 'pid'; }
 
 my %colMap = (
@@ -35,12 +186,18 @@ sub _init_knownCols
         %knownCols = map {
             defined $colMap{$_} or $colMap{$_} = $_;
             my $fn = $colMap{$_};
-	    $@ = undef;
-	    eval { $table->[0]->$fn() };
-            $_ => ( $@ ? 0 : 1)
+            $@ = undef;
+            eval { $table->[0]->$fn() };
+            $_ => ( $@ ? 0 : 1 )
         } @colNames;
     }
 }
+
+=head2 collectData
+
+Retrieves the data from L<Proc::ProcessTable> and put it into fetchable rows.
+
+=cut
 
 sub collectData()
 {
@@ -67,136 +224,6 @@ sub collectData()
     return \@data;
 }
 
-=pod
-
-=head1 NAME
-
-DBD::Sys::Plugin::Unix::Procs - provides a table containing running processes
-
-=head1 SYNOPSIS
-
-  $alltables = $dbh->selectall_hashref("select * from procs", "pid");
-
-=head1 DESCRIPTION
-
-Columns:
-
-=over 8
-
-=item uid
-
-UID of process
-
-=item gid
-
-GID of process
- 
-=item euid
-
-Effective UID of process
-  
-=item egid
-
-Effective GID of process
-  
-=item pid
-
-Process ID
-  
-=item ppid
-
-Parent process ID
-  
-=item pgrp
-
-Process group
-  
-=item sess
-
-Session ID
-
-=item cpuid
-
-CPU ID of processor running on        # FIX ME!
-  
-=item priority
-
-Priority of process
-  
-=item ttynum
-
-TTY number of process
-  
-=item flags
-
-Flags of process
-  
-=item fulltime        
-
-User + system time                 
-  
-=item ctime
-
-Child user + system time
-  
-=item timensec
-
-User + system nanoseconds part        # FIX ME!
-  
-=item ctimensec   
-
-Child user + system nanoseconds       # FIX ME!
-  
-=item qtime       
-
-Cumulative cpu time                   # FIX ME!
-  
-=item size        
-
-Virtual memory size (bytes)
-  
-=item rss         
-
-Resident set size (bytes)
-  
-=item wchan       
-
-Address of current system call 
-  
-=item fname       
-
-File name
-  
-=item start       
-
-Start time (seconds since the epoch)
-  
-=item pctcpu      
-
-Percent cpu used since process started
-  
-=item state       
-
-State of process
-  
-=item pctmem      
-
-Percent memory                     
-  
-=item cmndline
-
-Full command line of process
-  
-=item ttydev      
-
-Path of process's tty
-  
-=item clname      
-
-Scheduling class name                 #FIX ME!
-
-=back
-
 =head1 PREREQUISITES
 
 The module C<Proc::Processtable> is required to provide data for the table.
@@ -206,7 +233,7 @@ The module C<Proc::Processtable> is required to provide data for the table.
     Jens Rehsack			Alexander Breibach
     CPAN ID: REHSACK
     rehsack@cpan.org			alexander.breibach@googlemail.com
-    http://www.rehsack.de/		http://...
+    http://www.rehsack.de/
 
 =head1 COPYRIGHT
 
@@ -219,11 +246,12 @@ LICENSE file included with this module.
 =head1 SUPPORT
 
 Free support can be requested via regular CPAN bug-tracking system. There is
-no guaranteed reaction time or solution time. It depends on business load.
+no guaranteed reaction time or solution time, but it's always tried to give
+accept or reject a reported ticket within a week. It depends on business load.
 That doesn't mean that ticket via rt aren't handles as soon as possible,
 that means that soon depends on how much I have to do.
 
-Business and commercial support should be aquired from the authors via
+Business and commercial support should be acquired from the authors via
 preferred freelancer agencies.
 
 =cut

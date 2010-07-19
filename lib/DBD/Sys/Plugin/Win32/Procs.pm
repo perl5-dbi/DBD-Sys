@@ -9,6 +9,74 @@ use base qw(DBD::Sys::Table);
 $VERSION  = "0.02";
 @colNames = qw(pid ppid uid sess cmndline start fulltime virtsize fname state threads);
 
+=pod
+
+=head1 NAME
+
+DBD::Sys::Plugin::Win32::Procs - provides a table containing running processes
+
+=head1 SYNOPSIS
+
+  $processes = $dbh->selectall_hashref("select * from procs", "pid");
+
+=head1 ISA
+
+  DBD::Sys::Plugin::Win32::Procs;
+  ISA DBD::Sys::Table
+
+=head1 DESCRIPTION
+
+This module provides the table C<procs> for the MSWin32 compatible
+environment (this might cover cygwin, too).
+
+=head2 COLUMNS
+
+=head3 pid
+
+Process ID
+
+=head3 ppid
+
+Parent process ID
+
+=head3 uid
+
+UID of process
+
+=head3 sess
+
+Session ID
+
+=head3 fulltime
+
+User + system time
+
+=head3 virtsize
+
+Virtual memory size (bytes)
+
+=head3 fname       
+
+File name
+
+=head3 start       
+
+Start time (seconds since the epoch)
+
+=head3 state       
+
+State of process
+
+=head3 cmndline
+
+Full command line of process
+
+=head3 threads      
+
+Amount of threads used by this process
+
+=cut
+
 my ( $have_win32_process_info, $have_win32_process_commandline ) = ( 0, 0 );
 eval { require Win32::Process::Info;        $have_win32_process_info        = 1; };
 eval { require Win32::Process::CommandLine; $have_win32_process_commandline = 1; };
@@ -16,10 +84,29 @@ eval { require Win32::Process::CommandLine; $have_win32_process_commandline = 1;
 Win32::Process::Info->import( 'NT', 'WMI' ) if ($have_win32_process_info);
 Win32::Process::CommandLine->import() if ($have_win32_process_commandline);
 
-sub getColNames()   { @colNames }
+=head1 METHODS
+
+=head2 getColNames
+
+Returns the column names of the table as named in L</Columns>
+
+=cut
+
+sub getColNames() { @colNames }
+
+=head2 getPrimaryKey
+
+Returns 'pid' - which is the process identifier.
+
+=cut
+
 sub getPrimaryKey() { return 'pid'; }
 
-use Data::Dumper;
+=head2 collectData
+
+Retrieves the data from L<Win32::Process::Info> and put it into fetchable rows.
+
+=cut
 
 sub collectData
 {
@@ -56,24 +143,23 @@ sub collectData
     return \@data;
 }
 
-=pod
+=head1 PREREQUISITES
 
-=head1 NAME
-
-DBD::Sys::Plugin::Win32::Procs - provides a table containing running processes
-
-=head1 SYNOPSIS
-
-  $alltables = $dbh->selectall_hashref("select * from procs", "pid");
-
-=head1 DESCRIPTION
+The module C<Win32::Process::Info> is required to provide data for the
+table. In rare cases, it could be useful to have
+L<Win32::Process::CommandLine> installed, too.
 
 =head1 AUTHOR
 
     Jens Rehsack			Alexander Breibach
     CPAN ID: REHSACK
     rehsack@cpan.org			alexander.breibach@googlemail.com
-    http://www.rehsack.de/		http://...
+    http://www.rehsack.de/
+
+=head1 ACKNOWLEDGEMENTS
+
+The primary hint how to provide this table for windows comes from
+H.Merijn Brand.
 
 =head1 COPYRIGHT
 
@@ -86,11 +172,12 @@ LICENSE file included with this module.
 =head1 SUPPORT
 
 Free support can be requested via regular CPAN bug-tracking system. There is
-no guaranteed reaction time or solution time. It depends on business load.
+no guaranteed reaction time or solution time, but it's always tried to give
+accept or reject a reported ticket within a week. It depends on business load.
 That doesn't mean that ticket via rt aren't handles as soon as possible,
 that means that soon depends on how much I have to do.
 
-Business and commercial support should be aquired from the authors via
+Business and commercial support should be acquired from the authors via
 preferred freelancer agencies.
 
 =cut

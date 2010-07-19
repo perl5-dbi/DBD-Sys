@@ -4,28 +4,60 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = 0.02;
+use base qw(DBD::Sys::Plugin);
 
-#################### main pod documentation start ###################
+$VERSION = 0.02;
 
 =head1 NAME
 
 DBD::Sys::Plugin::Meta - provides tables with meta information about DBD::Sys.
 
-=head1 TABLES
+=head1 ISA
+
+  DBD::Sys::Plugin::Meta
+  ISA DBD::Sys::Plugin
+
+=head1 DESCRIPTION
+
+This plugin is created to manage the tables containing DBD::Sys meta data.
+
+=head2 TABLES
 
 Provided tables:
 
-=over 8
-
-=item alltables
+=head3 alltables
 
 Table containing the list of available tables. See
 L<DBD::Sys::Plugin::Meta::AllTables> for details.
 
-=back
+=head1 METHODS
+
+=cut
+
+require DBD::Sys::Plugin::Meta::AllTables;
+
+my %supportedTables = ( alltables => 'DBD::Sys::Plugin::Meta::AllTables', );
+
+=head2 getSupportedTables
+
+Delivers the supported meta tables.
+
+=cut
+
+sub getSupportedTables() { %supportedTables }
+
+=head2 getPriority
+
+Delivers the default priority for the meta tables, which is 100.
+
+=cut
+
+sub getPriority { return 100; }
 
 =head1 PREREQUISITES
+
+The meta tables provide information about the tables in DBD::Sys, so
+their only requirement is DBD::Sys.
 
 =head1 BUGS & LIMITATIONS
 
@@ -49,23 +81,14 @@ LICENSE file included with this module.
 =head1 SUPPORT
 
 Free support can be requested via regular CPAN bug-tracking system. There is
-no guaranteed reaction time or solution time. It depends on business load.
+no guaranteed reaction time or solution time, but it's always tried to give
+accept or reject a reported ticket within a week. It depends on business load.
 That doesn't mean that ticket via rt aren't handles as soon as possible,
 that means that soon depends on how much I have to do.
 
-Business and commercial support should be aquired from the authors via
+Business and commercial support should be acquired from the authors via
 preferred freelancer agencies.
 
 =cut
-
-#################### main pod documentation end ###################
-
-require DBD::Sys::Plugin::Meta::AllTables;
-
-my %supportedTables = ( alltables => 'DBD::Sys::Plugin::Meta::AllTables', );
-
-sub getSupportedTables() { %supportedTables }
-
-sub getPriority { return 200; }
 
 1;

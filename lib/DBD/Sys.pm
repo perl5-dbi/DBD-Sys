@@ -147,8 +147,10 @@ sub STORE ($$$)
 
     if ( $attrib eq "sys_pluginmgr_class" )
     {
+        $@ = undef;
         $dbh->{sys_pluginmgr} = $dbh->{sys_pluginmgr_class}->new();
         my $sys_plugin_attrs = $dbh->{sys_pluginmgr}->getTablesAttrs();
+
         foreach my $plugin_attr ( keys %{$sys_plugin_attrs} )
         {
             $dbh->{sys_valid_attrs}->{$plugin_attr} = 1;
@@ -304,37 +306,59 @@ and 4.
 
 To retrieve data, you can use the following example:
 
-        my $dbh = DBI->connect('DBI:Sys:');
-        $st  = $dbh->prepare( 'SELECT DISTINCT username, uid FROM pwent WHERE username=?' );
-        $num = $st->execute(getlogin() || $ENV{USER} || $ENV{USERNAME});
-	while( $row = $st->fetchrow_hashref() )
-	{       
-	    printf( "Found result row: uid = %d, username = %s\n", $row->{uid}, $row->{username} );
-	}       
+    my $dbh = DBI->connect('DBI:Sys:');
+    $st  = $dbh->prepare( 'SELECT DISTINCT username, uid FROM pwent WHERE username=?' );
+    $num = $st->execute(getlogin() || $ENV{USER} || $ENV{USERNAME});
+    while( $row = $st->fetchrow_hashref() )
+    {       
+	printf( "Found result row: uid = %d, username = %s\n", $row->{uid}, $row->{username} );
+    }       
 
 =head2 Error handling
 
-Following soon...
+Errors while processing statements are handled via DBI - read L<DBI>
+documentation, especially the C<err> and C<errstr> documentation,
+if you're not familiar with error handling in DBI.
+
+Errors while modifying attributes, calling driver methods etc. are
+reported by throwing an exception using L<Carp|Carp::croak>.
 
 =head2 Metadata
 
-Not yet implemented, but following soon: Block-Sizing, LsoF, Directories, etc.
+Each table implementor can request configurable meta data attributes.
+They will be accessible via the database handle:
 
-=head2 Restrictions
-
-e.g. No modifying of system tables ...
+    print $dbh->{"sys_" . lc $table . "_" . $attr}, "\n";
+    # e.g.
+    print DBI->neat( $dbh->{sys_filesysdf_blocksize} ), "\n";
 
 =head1 BUGS & LIMITATIONS
 
 This module does not support any changes to the provided tables in order
-to prevent inconsistant data.
+to prevent inconsistent data.
+
+The design of the plugins makes it less predictable what columns are
+provided in the end. Well, at least those columns from the tables
+provided by the DBD::Sys::Plugin::Meta and DBD::Sys::Plugin::Any
+will be available, even if they are not filled with data when the
+appropriate module is missing (e.g. if L<Sys::Filesystem> is not
+available, the table C<filesystems> gets the columns provided by
+L<DBD::Sys::Plugin::Any::Filesys>, but no data at all).
+
+All additional table implementors must use the same primary key as
+all other implementors. To stay at the example of C<filesystems>, the
+primary key is I<mountpoint> - and if any additional module provides
+another implementation (with data from another module than
+C<Sys::Filesystem>), it needs to ensure that the column I<mountpoint>
+is provided and unique. Additionally it must return I<mountpoint> as
+primary key when it's method C<getPrimaryKey> is invoked.
 
 =head1 AUTHOR
 
     Jens Rehsack			Alexander Breibach
     CPAN ID: REHSACK
     rehsack@cpan.org			alexander.breibach@googlemail.com
-    http://www.rehsack.de/		http://...
+    http://search.cpan.org/~rehsack/
 
 =head1 COPYRIGHT
 
@@ -348,11 +372,12 @@ LICENSE file included with this module.
 
 Free support can be requested via regular CPAN bug-tracking system at
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBD-Sys>. There is
-no guaranteed reaction time or solution time. It depends on business load.
+no guaranteed reaction time or solution time, but it's always tried to give
+accept or reject a reported ticket within a week. It depends on business load.
 That doesn't mean that ticket via rt aren't handles as soon as possible,
 that means that soon depends on how much I have to do.
 
-Business and commercial support should be aquired from the authors via
+Business and commercial support should be acquired from the authors via
 preferred freelancer agencies.
 
 =head1 SEE ALSO

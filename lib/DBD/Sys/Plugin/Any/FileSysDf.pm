@@ -7,6 +7,23 @@ use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
+=pod
+
+=head1 NAME
+
+DBD::Sys::Plugin::Any::FileSysDf - provides a table containing the free space of file systems
+
+=head1 SYNOPSIS
+
+  $filesysdf = $dbh->selectall_hashref("select * from filesysdf", "mountpoint");
+
+=head1 ISA
+
+  DBD::Sys::Plugin::Any::FileSysDf
+  ISA DBD::Sys::Table
+
+=cut
+
 my $haveFilesysDf = 0;
 eval {
     require Sys::Filesystem;
@@ -18,8 +35,99 @@ Filesys::DfPortable->import() if ($haveFilesysDf);
 $VERSION  = "0.02";
 @colNames = qw(mountpoint blocks bfree bavail bused bper files ffree favail fused fper);
 
-sub getColNames()   { return @colNames }
+=head1 DESCRIPTION
+
+This module provides the table <filesysdf> which contains the free space
+on file systems.
+
+=head2 COLUMNS
+
+=head3 mountpoint
+
+The friendly name of the filesystem. This will usually be the same
+name as appears in the list returned by the filesystems() method.
+
+=head3 blocks
+
+Total blocks existing on the filesystem.
+
+=head3 bfree
+
+Total blocks free existing on the filesystem.
+
+=head3 bavail
+
+Total blocks available to the user executing the Perl application.
+This can be different than C<bfree> if you have per-user quotas on
+the filesystem, or if the super user has a reserved amount.
+C<bavail> can also be a negative value because of this. For instance
+if there is more space being used then you have available to you.
+
+=head3 bused
+
+Total blocks used existing on the filesystem.
+
+=head3 bper
+
+Percent of disk space used. This is based on the disk space available
+to the user executing the application. In other words, if the filesystem
+has 10% of its space reserved for the superuser, then the percent used
+can go up to 110%.
+
+=head3 files
+
+Total inodes existing on the filesystem.
+
+=head3 ffree
+
+Total inodes free existing on the filesystem.
+
+=head3 favail
+
+Total inodes available to the user executing the application.
+See the information for the C<bavail> column.
+
+=head3 fused
+
+Total inodes used existing on the filesystem.
+
+=head3 fper
+
+Percent of inodes used on the filesystem.
+See the information for the C<bper> column.
+
+=head1 METHODS
+
+=head2 getColNames
+
+Returns the column names of the table as named in L</Columns>
+
+=cut
+
+sub getColNames() { return @colNames }
+
+=head2 getAttributes
+
+Return the attributes supported by this module:
+
+=head3 blocksize
+
+Allows to specify the blocksize of the returned free blocks.
+This defaults to 1.
+
+    $dbh->{sys_filesysdf_blocksize} = 512; # use UNIX typical blocksize for df
+
+=cut
+
 sub getAttributes() { return qw(blocksize) }
+
+=head2 collectData
+
+Retrieves the mountpoints of mounted file systems from L<Sys::Filesystem>
+and determine the free space on their devices using L<Filesys::DfPortable>.
+The mountpoint and the free space information are put in fetchable rows.
+
+=cut
 
 sub collectData()
 {
@@ -55,89 +163,17 @@ sub collectData()
     return \@data;
 }
 
-=pod
-
-=head1 NAME
-
-DBD::Sys::Plugin::Any::FileSysDf - provides a table containing the free space of file systems
-
-=head1 SYNOPSIS
-
-  $alltables = $dbh->selectall_hashref("select * from filesysdf", "mountpoint");
-
-=head1 DESCRIPTION
-
-Columns:
-
-=over 8
-
-=item mountpoint
-
-The friendly name of the filesystem. This will usually be the same
-name as appears in the list returned by the filesystems() method.
-
-=item blocks
-
-Total blocks existing on the filesystem.
-
-=item bfree
-
-Total blocks free existing on the filesystem.
-
-=item bavail
-
-Total blocks available to the user executing the Perl application.
-This can be different than C<bfree> if you have per-user quotas on
-the filesystem, or if the super user has a reserved amount.
-C<bavail> can also be a negative value because of this. For instance
-if there is more space being used then you have available to you.
-
-=item bused
-
-Total blocks used existing on the filesystem.
-
-=item bper
-
-Percent of disk space used. This is based on the disk space available
-to the user executing the application. In other words, if the filesystem
-has 10% of its space reserved for the superuser, then the percent used
-can go up to 110%.
-
-=item files
-
-Total inodes existing on the filesystem.
-
-=item ffree
-
-Total inodes free existing on the filesystem.
-
-=item favail
-
-Total inodes available to the user executing the application.
-See the information for the C<bavail> column.
-
-=item fused
-
-Total inodes used existing on the filesystem.
-
-=item fper
-
-Percent of inodes used on the filesystem.
-See the information for the C<bper> column.
-
-=back
-
 =head1 PREREQUISITES
 
 C<Sys::Filesystem> and C<Filesys::DfPortable> are required in order to
-run this table.
+fill the table C<filesysdf> with data.
 
 =head1 AUTHOR
 
     Jens Rehsack			Alexander Breibach
     CPAN ID: REHSACK
     rehsack@cpan.org			alexander.breibach@googlemail.com
-    http://www.rehsack.de/		http://...
+    http://www.rehsack.de/
 
 =head1 COPYRIGHT
 
@@ -150,11 +186,12 @@ LICENSE file included with this module.
 =head1 SUPPORT
 
 Free support can be requested via regular CPAN bug-tracking system. There is
-no guaranteed reaction time or solution time. It depends on business load.
+no guaranteed reaction time or solution time, but it's always tried to give
+accept or reject a reported ticket within a week. It depends on business load.
 That doesn't mean that ticket via rt aren't handles as soon as possible,
 that means that soon depends on how much I have to do.
 
-Business and commercial support should be aquired from the authors via
+Business and commercial support should be acquired from the authors via
 preferred freelancer agencies.
 
 =cut

@@ -7,6 +7,23 @@ use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
+=pod
+
+=head1 NAME
+
+DBD::Sys::Plugin::Any::FileSys - provides a table containing file systems
+
+=head1 SYNOPSIS
+
+  $filesystems = $dbh->selectall_hashref("select * from filesystems", "mountpoint");
+
+=head1 ISA
+
+  DBD::Sys::Plugin::Any::FileSys
+  ISA DBD::Sys::Table
+
+=cut
+
 my $haveSysFs = 0;
 eval {
     require Sys::Filesystem;
@@ -16,8 +33,70 @@ eval {
 $VERSION  = "0.02";
 @colNames = qw(mountpoint mounted label volume device special type options);
 
-sub getColNames()  { @colNames }
+=head1 DESCRIPTION
+
+This module provides the table C<filesystems> for any operating system.
+
+=head2 COLUMNS
+
+=head3 mountpoint
+
+The friendly name of the filesystem. This will usually be the same
+name as appears in the list returned by the filesystems() method.
+
+=head3 mounted
+
+Boolean, true if the filesystem is mounted.
+
+=head3 label
+
+The fileystem label
+
+=head3 volume
+
+Volume that the filesystem belongs to or is mounted on.
+
+=head3 device
+
+The physical device that the filesystem is connected to.
+
+=head3 special
+
+Boolean true if the filesystem type is considered "special".
+
+=head3 type
+
+The type of filesystem format, e.g. fat32, ntfs, ufs, hpfs, ext3, xfs etc.
+
+=head3 options
+
+The options that the filesystem was mounted with.
+This may commonly contain information such as read-write,
+user and group settings and permissions.
+
+=head1 METHODS
+
+=head2 getColNames
+
+Returns the column names of the table as named in L</Columns>
+
+=cut
+
+sub getColNames() { @colNames }
+
+=head2 getTableName
+
+Returns 'filesystems'
+
+=cut
+
 sub getTableName() { return 'filesystems'; }
+
+=head2 collectData
+
+Retrieves the data from L<Sys::Filesystem> and put it into fetchable rows.
+
+=cut
 
 sub collectData()
 {
@@ -44,59 +123,6 @@ sub collectData()
     return \@data;
 }
 
-=pod
-
-=head1 NAME
-
-DBD::Sys::Plugin::Any::FileSys - provides a table containing file systems
-
-=head1 SYNOPSIS
-
-  $alltables = $dbh->selectall_hashref("select * from filesystems", "mountpoint");
-
-=head1 DESCRIPTION
-
-Columns:
-
-=over 8
-
-=item mountpoint
-
-The friendly name of the filesystem. This will usually be the same
-name as appears in the list returned by the filesystems() method.
-
-=item mounted
-
-Boolean true if the filesystem is mounted.
-
-=item label
-
-The fileystem label
-
-=item volume
-
-Volume that the filesystem belongs to or is mounted on.
-
-=item device
-
-The physical device that the filesystem is connected to.
-
-=item special
-
-Boolean true if the filesystem type is considered "special".
-
-=item type
-
-The type of filesystem format, e.g. fat32, ntfs, ufs, hpfs, ext3, xfs etc.
-
-=item options
-
-The options that the filesystem was mounted with.
-This may commonly contain information such as read-write,
-user and group settings and permissions.
-
-=back
-
 =head1 PREREQUISITES
 
 C<Sys::Filesystem> is required to use this table.
@@ -106,7 +132,7 @@ C<Sys::Filesystem> is required to use this table.
     Jens Rehsack			Alexander Breibach
     CPAN ID: REHSACK
     rehsack@cpan.org			alexander.breibach@googlemail.com
-    http://www.rehsack.de/		http://...
+    http://www.rehsack.de/
 
 =head1 COPYRIGHT
 
@@ -119,11 +145,12 @@ LICENSE file included with this module.
 =head1 SUPPORT
 
 Free support can be requested via regular CPAN bug-tracking system. There is
-no guaranteed reaction time or solution time. It depends on business load.
+no guaranteed reaction time or solution time, but it's always tried to give
+accept or reject a reported ticket within a week. It depends on business load.
 That doesn't mean that ticket via rt aren't handles as soon as possible,
 that means that soon depends on how much I have to do.
 
-Business and commercial support should be aquired from the authors via
+Business and commercial support should be acquired from the authors via
 preferred freelancer agencies.
 
 =cut
