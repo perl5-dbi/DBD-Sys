@@ -145,7 +145,7 @@ sub collectData
 
 =head1 PREREQUISITES
 
-The module C<Win32::Process::Info> is required to provide data for the
+The module L<Win32::Process::Info> is required to provide data for the
 table. In rare cases, it could be useful to have
 L<Win32::Process::CommandLine> installed, too.
 

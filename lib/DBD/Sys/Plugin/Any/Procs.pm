@@ -226,7 +226,7 @@ sub collectData()
 
 =head1 PREREQUISITES
 
-The module C<Proc::Processtable> is required to provide data for the table.
+The module L<Proc::ProcessTable> is required to provide data for the table.
 
 =head1 AUTHOR
 

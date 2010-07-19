@@ -125,7 +125,7 @@ sub collectData()
 
 =head1 PREREQUISITES
 
-C<Sys::Filesystem> is required to use this table.
+L<Sys::Filesystem> is required to use this table.
 
 =head1 AUTHOR
 

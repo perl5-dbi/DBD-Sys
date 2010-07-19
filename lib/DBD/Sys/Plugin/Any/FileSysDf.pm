@@ -138,7 +138,7 @@ sub collectData()
     {
         my $fs          = Sys::Filesystem->new();
         my @filesystems = $fs->filesystems( mounted => 1 );
-        my $blocksize   = $self->{attrs}->{blocksize} || 1;
+        my $blocksize   = $self->{meta}->{blocksize} || 1;
 
         foreach my $filesys (@filesystems)
         {
@@ -165,7 +165,7 @@ sub collectData()
 
 =head1 PREREQUISITES
 
-C<Sys::Filesystem> and C<Filesys::DfPortable> are required in order to
+L<Sys::Filesystem> and L<Filesys::DfPortable> are required in order to
 fill the table C<filesysdf> with data.
 
 =head1 AUTHOR

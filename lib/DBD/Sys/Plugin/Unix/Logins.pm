@@ -19,7 +19,7 @@ eval {
 
 =head1 NAME
 
-DBD::Sys::Plugin::Unix::Logins - provides a table containing a list of operating system users
+DBD::Sys::Plugin::Unix::Logins - provides a table containing logged on users
 
 =head1 SYNOPSIS
 
@@ -27,13 +27,13 @@ DBD::Sys::Plugin::Unix::Logins - provides a table containing a list of operating
 
 =head1 ISA
 
-  DBD::Sys::Plugin::Unix::logins;
+  DBD::Sys::Plugin::Unix::Logins;
   ISA DBD::Sys::Table
 
 =head1 DESCRIPTION
 
-This module provides the table I<pwent> filled the data from the password
-database C<passwd(5)>.
+This module provides the table I<logins> filled with the data from the utmp
+database C<utmp(5)>.
 
 =head2 COLUMNS
 
@@ -127,7 +127,7 @@ sub collectData()
     if ($haveSysUtmp)
     {
 	my %params;
-	$self->{attrs}->{filename} and $params{Filename} = $self->{attrs}->{filename};
+	$self->{meta}->{filename} and $params{Filename} = $self->{attrs}->{filename};
         my $utmp = Sys::Utmp->new(%params);
 	my $id = 0;
 
@@ -156,20 +156,14 @@ sub collectData()
 
 =head1 PREREQUISITES
 
-Perl support for the functions getpwent, setpwent, endpwent is required
-to provide data for the table.
+The module C<Sys::Utmp> is required to provide data for the table.
 
 =head1 AUTHOR
 
-    Jens Rehsack			Alexander Breibach
+    Jens Rehsack
     CPAN ID: REHSACK
-    rehsack@cpan.org			alexander.breibach@googlemail.com
+    rehsack@cpan.org
     http://www.rehsack.de/
-
-=head1 ACKNOWLEDGEMENTS
-
-Some advisories how to implement the data collecting safer and more
-portable was provided by Ashish SHUKLA <ashish@freebsd.org>.
 
 =head1 COPYRIGHT
 

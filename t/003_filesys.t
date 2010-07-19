@@ -45,7 +45,6 @@ SKIP:
       );    # " instead of ' because $mountpoint needs to be evaluated!
     ok( $num = $st->execute(), 'execute filesysdf' );
 
-    use Data::Dumper;
     while ( $row = $st->fetchrow_hashref() )
     {
         cmp_ok( $row->{bfree} + $row->{bused},
