@@ -84,8 +84,11 @@ use vars qw($VERSION);
 use Carp qw(croak);
 use Module::Pluggable::Object;
 use Scalar::Util qw(blessed);
+use Params::Util qw(_ARRAY);
 
 $VERSION = "0.02";
+
+=pod
 
 =head1 METHODS
 
@@ -118,7 +121,9 @@ sub getSupportedTables
         my $tblName;
         $tblClass->can('getTableName') and $tblName = $tblClass->getTableName();
         $tblName or ( ( $tblName = $tblClass ) =~ s/.*::(\p{Word}+)$/$1/ );
-        $supportedTables{$tblName} = $tblClass;
+        exists $supportedTables{$tblName} and !defined(_ARRAY($supportedTables{$tblName})) and $supportedTables{$tblName} = [ $supportedTables{$tblName} ];
+        exists $supportedTables{$tblName} and push( @{$supportedTables{$tblName}}, $tblClass );
+        exists $supportedTables{$tblName} or $supportedTables{$tblName} = $tblClass;
     }
 
     return %supportedTables;

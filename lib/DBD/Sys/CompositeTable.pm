@@ -8,6 +8,7 @@ require SQL::Eval;
 require DBI::DBD::SqlEngine;
 use Scalar::Util qw(blessed weaken);
 use Clone qw(clone);
+use Carp qw(croak);
 
 @ISA     = qw(DBD::Sys::Table);
 $VERSION = "0.02";
@@ -143,6 +144,24 @@ of 500. So C<D::S::P::Any::Procs> dominates.
 
 my %compositedInfo;
 
+sub _pk_cmp_fail
+{
+    my ($pk, $epk) = @_;
+    ref($pk) eq ref($epk) or return sprintf( "Can't compare primary key type (%s) of '%s' with primary key type (%s) of '%s'", ref($epk) ? "\\" . ref($epk) : "SCALAR", "%s", ref($pk) ? "\\" . ref($pk) : "SCALAR", "%s" );
+    if( ref($pk) eq "" )
+    {
+        $pk eq $epk and return;
+        return sprintf( "Primary key (%s) of '%s' differs from primary key (%s) of '%s'", DBI::neat($epk), "%s", DBI::neat($pk), "%s" );
+    }
+    elsif( ref($pk) eq "ARRAY" )
+    {
+        join( "\0", sort @$epk ) eq join( "\0", sort @$pk ) and return;
+        return sprintf( "Primary key (%s) of '%s' differs from primary key (%s) of '%s'", DBI::neat_list( $epk ), "%s", DBI::neat_list($pk), "%s" );
+    }
+
+    croak "Invalid type for primary key: " . ref($pk);
+}
+
 sub new
 {
     my ( $proto, $tableInfo, $attrs ) = @_;
@@ -164,9 +183,8 @@ sub new
         if ($allColIdx)
         {
             my $embedPK = $embedded->getPrimaryKey();
-            $primaryKey eq $embedPK
-              or croak( "Primary key ($embedPK) of '$tblClass' differs from primary key ($primaryKey) of "
-                        . join( ", ", keys %mergeCols ) );
+            my $pkFailure = _pk_cmp_fail( $primaryKey, $embedPK );
+            $pkFailure and croak( sprintf( $pkFailure, $tblClass, join( ", ", keys %mergeCols ) ) );
             $mergeCols{$tblClass} = [];
             foreach my $colIdx ( 0 .. $#embedColNames )
             {
@@ -243,42 +261,47 @@ sub collectData
     my $meta          = $self->{meta};
     my $compositeName = $meta->{composite_name};
     my $rowOffset     = 0;
+    my @primaryKeys   = (ref $meta->{primary_key}) ? @{$meta->{primary_key}} : ($meta->{primary_key});
     foreach my $embedded ( @{ $meta->{embed} } )
     {
-        my $nextRowOffset;
-        my $pkIdx       = $embedded->column_num( $meta->{primary_key} );
-        my $mergeCols   = $meta->{merge_cols}->{ blessed($embedded) };
-        my $enhanceCols = $meta->{enhance_cols}->{ blessed($embedded) };
+        my @pkIdx         = map { $embedded->column_num( $_ ) } @primaryKeys;
+        my $mergeCols     = $meta->{merge_cols}->{ blessed($embedded) };
+        my $enhanceCols   = $meta->{enhance_cols}->{ blessed($embedded) };
+        my $nextRowOffset = $rowOffset + scalar(@$mergeCols);
+
         while ( my $row = $embedded->fetch_row() )
         {
-            $nextRowOffset ||= $rowOffset + scalar(@$mergeCols);
-            my $pk = $row->[$pkIdx];
-            if ( $data{$pk} )
+            my $pks = join( "\0", map { DBI::neat($_) } @$row[@pkIdx] );
+            my $ref = \%data;
+            $ref = $ref->{$pks} ||= [];
+            if ( @{$ref} )
             {
-                if ( scalar( @{ $data{$pk} } ) == $nextRowOffset )
+                if ( scalar( @{ $ref } ) == $nextRowOffset )
                 {
                     warn "primary key '" . $meta->{primary_key} . "' is not unique for " . blessed($embedded);
                 }
                 else
                 {
-                    push( @{ $data{$pk} }, @$row[@$mergeCols] );
+                    push( @{ $ref }, @$row[@$mergeCols] );
                 }
             }
             else
             {
                 if ( 0 == $rowOffset )
                 {
-                    $data{$pk} = [@$row];
+                    @$ref = @$row;
                 }
                 else
                 {
                     my @entry = (undef) x $rowOffset;
                     @entry[ keys %{$enhanceCols} ] = @$row[ values %{$enhanceCols} ];
                     push( @entry, @$row[@$mergeCols] );
-                    $data{$pk} = \@entry;
+                    @$ref = @entry;
                 }
             }
         }
+
+        $rowOffset = $nextRowOffset;
     }
 
     my @data = values %data;

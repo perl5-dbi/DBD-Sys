@@ -124,7 +124,7 @@ sub collectData
             $cli ||= "";
             $cli =~ s{^\S+\\}{};
             $cli =~ s{\s+$}{};
-            push( @data,
+            push( @data, [
                   $procInfo->{ProcessId},
                   $procInfo->{ParentProcessId} || 0,
                   $uid,
@@ -136,7 +136,7 @@ sub collectData
                   $procInfo->{ExecutablePath},
                   $procInfo->{_status} || $procInfo->{Status} || $procInfo->{ExecutionState},
                   $procInfo->{ThreadCount} || 1,
-                );
+              ] );
         }
     }
 

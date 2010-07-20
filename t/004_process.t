@@ -30,32 +30,48 @@ else
     $table = [];
 }
 
-# $< refers to the current user (Hello, it's me ;-))
-ok( $st = $dbh->prepare("SELECT COUNT(uid) FROM procs WHERE procs.uid=$<"), 'prepare process' );
+BEGIN
+{
+    if ( $^O eq 'MSWin32' )
+    {
+        require Win32::pwent;
+    }
+}
+
+my ( $username, $userid, $groupname, $groupid );
+
+if ( $^O eq 'MSWin32' )
+{
+    $username  = getlogin() || $ENV{USERNAME};
+    $userid    = Win32::pwent::getpwnam($username);
+    $groupid   = ( Win32::pwent::getpwnam($username) )[3];
+    $groupname = Win32::pwent::getgrgid($groupid);
+}
+else
+{
+    $userid    = $<;
+    $username  = getpwuid($<);
+    $groupid   = $(;
+    $groupname = getgrgid($();
+}
+
+ok( $st = $dbh->prepare("SELECT COUNT(uid) FROM procs WHERE procs.uid=$userid"), 'prepare process' );
 ok( my $num = $st->execute(), 'execute process' );
 SKIP:
 {
     skip( "OS seems to be unsupported", 1 ) unless scalar(@$table) > 0;
     $row = $st->fetchrow_arrayref();
-    local $TODO = "Needs to be approved for MSWin32" if $^O eq "MSWin32";
     ok( $row->[0], 'process found for current user' );
 }
 
 ok( $dbh = DBI->connect('DBI:Sys:'), 'connect 2' );
-ok(
-    $st = $dbh->prepare(
-        'SELECT username, COUNT(procs.uid) as process_ct FROM procs, pwent WHERE procs.uid = pwent.uid GROUP BY username'
-    ),
-    'prepare process join user'
-  );    # how many process per user
+ok( $st = $dbh->prepare( 'SELECT username, COUNT(procs.uid) as process_ct FROM procs, pwent WHERE procs.uid = pwent.uid GROUP BY username'), 'prepare process join user');    # how many process per user
 #print $st;
 ok( $num = $st->execute(), 'execute process join user' );
 SKIP:
 {
     skip( "OS seems to be unsupported", 1 ) unless scalar(@$table) > 0;
     $row = $st->fetchrow_arrayref();    # arrayref BECAUSE hash needs keys (eg. ColumnNames) and array just counts.
-    local $TODO = "Needs to be approved for MSWin32" if $^O eq "MSWin32";
-    ok( $row->[0], 'process found for every user' )
-      ;                                 # $row[0] refers to the first column of the array...here it's the number
+    ok( $row->[0], 'process found for every user' );
 }
 

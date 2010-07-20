@@ -105,7 +105,7 @@ Returns 'address'.
 
 =cut
 
-sub getPrimaryKey() { return 'address'; }
+sub getPrimaryKey() { return [qw(interface address_family address)]; }
 
 $haveNetInterface and *_getflags = sub {
     my $flags = $_[0] || 0;

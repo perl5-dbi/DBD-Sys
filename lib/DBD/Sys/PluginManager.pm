@@ -70,24 +70,31 @@ sub new
         foreach my $pluginTable ( keys %pluginTables )
         {
             my $pte = lc $pluginTable;
-            exists( $self->{tables2classes}->{$pte} )
-              and !defined( _ARRAY( $self->{tables2classes}->{$pte} ) )
-              and $self->{tables2classes}->{$pte} = [ $self->{tables2classes}->{$pte} ];
+            my @pluginClasses = defined( _ARRAY( $pluginTables{$pluginTable} ) ) ? @{ $pluginTables{$pluginTable} } : ($pluginTables{$pluginTable});
 
-            exists( $self->{tables2classes}->{$pte} )
-              and push(
-                        @{ $self->{tables2classes}->{$pte} },
-                        defined( _ARRAY( $pluginTables{$pluginTable} ) )
-                        ? @{ $pluginTables{$pluginTable} }
-                        : $pluginTables{$pluginTable}
-                      );
+            if( exists( $self->{tables2classes}->{$pte} ) )
+            {
+              defined( _ARRAY( $self->{tables2classes}->{$pte} ) )
+                  or $self->{tables2classes}->{$pte} = [ $self->{tables2classes}->{$pte} ];
 
-            exists( $self->{tables2classes}->{$pte} )
-              or $self->{tables2classes}->{$pte} = $pluginTables{$pluginTable};
+              push(
+                    @{ $self->{tables2classes}->{$pte} },
+                    defined( _ARRAY( $pluginTables{$pluginTable} ) )
+                    ? @{ $pluginTables{$pluginTable} }
+                    : $pluginTables{$pluginTable}
+                  );
+          }
+          else
+          {
+              $self->{tables2classes}->{$pte} = $pluginTables{$pluginTable};
+          }
 
-            $pluginTables{$pluginTable}->can('getAttributes')
+          foreach my $pluginClass (@pluginClasses)
+          {
+            $pluginClass->can('getAttributes')
               and push( @tableAttrs,
-                        map { join( '_', 'sys', $pte, $_ ) } $pluginTables{$pluginTable}->can('getAttributes') );
+                        map { join( '_', 'sys', $pte, $_ ) } $pluginClass->can('getAttributes') );
+          }
         }
     }
 
