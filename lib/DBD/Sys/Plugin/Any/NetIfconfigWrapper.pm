@@ -30,7 +30,7 @@ eval {
     $haveNetIfconfigWrapper = 1;
 };
 
-@colNames = qw(interface address_family address netmask hwadress flags_bin flags);
+@colNames = qw(interface address_family address netmask hwaddress flags_bin flags);
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ Netmask of the address above.
 
 Broadcast address for network address
 
-=head3 hwadress
+=head3 hwaddress
 
 Hardware address (MAC number) of the interface NIC.
 
@@ -71,14 +71,6 @@ Binary representation of the interface flags (at least I<up> or I<down>).
 =head3 flags
 
 Comma separated list of the flags.
-
-=head3 mtu
-
-MTU for this address in this interface.
-
-=head3 metric
-
-Metric for the interface/address.
 
 =head1 METHODS
 

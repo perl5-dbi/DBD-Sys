@@ -12,6 +12,7 @@ Revision history for Perl module DBD::Sys
       Ashish SHUKLA <ashish@freebsd.org> (and by Richard W. Stevens)
     - add logins table to get a list of logged in users
     - add openfiles table
+    - fix hwadress column in netint table to hwaddress
 
 0.01 2010-05-14
     - original version; released to an unsuspecting world ...

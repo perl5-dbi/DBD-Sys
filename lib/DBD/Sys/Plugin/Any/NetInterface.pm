@@ -31,7 +31,7 @@ eval {
     $haveNetInterface = 1;
 };
 
-@colNames = qw(interface address_family address netmask broadcast hwadress flags_bin flags mtu metric);
+@colNames = qw(interface address_family address netmask broadcast hwaddress flags_bin flags mtu metric);
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ Netmask of the address above.
 
 Broadcast address for network address
 
-=head3 hwadress
+=head3 hwaddress
 
 Hardware address (MAC number) of the interface NIC.
 
