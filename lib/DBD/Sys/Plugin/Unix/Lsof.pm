@@ -128,7 +128,7 @@ eval {
     $havelsof = 1;
 };
 eval {
-    require Sys::Filesystem::Mountpoint;
+    require Sys::Filesystem::MountPoint;
     $havesysfsmountpoint = 1;
 };
 
