@@ -126,20 +126,32 @@ sub collectData()
 
     if ($haveNetIfconfigWrapper)
     {
-        my $info = Net::Ifconfig::Wrapper::Ifconfig('list', '', '', '') or return [];
-        foreach my $interface (keys %$info)
+        my $info = Net::Ifconfig::Wrapper::Ifconfig( 'list', '', '', '' ) or return [];
+        foreach my $interface ( keys %$info )
         {
             my $ifdata = $info->{$interface};
-            if( exists $ifdata->{inet} )
+            if ( exists $ifdata->{inet} )
             {
-                while( my ($addr,$netmask) = each %{$ifdata->{inet}} )
+                while ( my ( $addr, $netmask ) = each %{ $ifdata->{inet} } )
                 {
-                    push(@data, [ $interface, 'inet', $addr, $netmask, $ifdata->{ether}, $ifdata->{status}, ( $ifdata->{status} ? '<up>' : '<down>' ) ] );
+                    push(
+                          @data,
+                          [
+                             $interface, 'inet', $addr, $netmask, $ifdata->{ether}, $ifdata->{status},
+                             ( $ifdata->{status} ? '<up>' : '<down>' )
+                          ]
+                        );
                 }
             }
             else
             {
-                push(@data, [ $interface, undef, undef, undef, $ifdata->{ether}, $ifdata->{status}, ( $ifdata->{status} ? '<up>' : '<down>' ) ] );
+                push(
+                      @data,
+                      [
+                         $interface, undef, undef, undef, $ifdata->{ether}, $ifdata->{status},
+                         ( $ifdata->{status} ? '<up>' : '<down>' )
+                      ]
+                    );
             }
         }
 

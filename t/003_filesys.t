@@ -3,12 +3,12 @@
 use Test::More tests => 7;    # the number of the tests to run.
 use FindBin qw($RealBin);     # class for getting the pathname.
 
-use DBI;
+do "t/lib.pl";
 
-my $haveSysFilesystem     = 0;
-my $haveFilesysDfPortable = 0;
-eval { require Sys::Filesystem; $haveSysFilesystem = 1; };
-eval { require Filesys::DfPortable; $haveFilesysDfPortable = 1; } if ($haveSysFilesystem);
+my @proved_vers = proveRequirements( [qw(Sys::Filesystem Filesys::DfPortable)] );
+showRequirements( undef, $proved_vers[1] );
+my $haveSysFilesystem     = $proved_vers[1]->{'Sys::Filesystem'};
+my $haveFilesysDfPortable = $proved_vers[1]->{'Filesys::DfPortable'};
 
 my $mountpt = '';
 

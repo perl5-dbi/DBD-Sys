@@ -2,8 +2,9 @@
 
 use Test::More tests => 16;
 
-use DBI;
-use Data::Dumper;
+do "t/lib.pl";
+
+my @proved_vers = proveRequirements( [qw(Sys::Filesystem Filesys::DfPortable)] );
 
 BEGIN
 {
@@ -17,7 +18,7 @@ my ( $username, $userid, $groupname, $groupid );
 
 if ( $^O eq 'MSWin32' )
 {
-    $username  = getlogin() || $ENV{USERNAME};
+    $username  = getlogin() || Win32::LoginName() || $ENV{USERNAME};
     $userid    = Win32::pwent::getpwnam($username);
     $groupid   = ( Win32::pwent::getpwnam($username) )[3];
     $groupname = Win32::pwent::getgrgid($groupid);

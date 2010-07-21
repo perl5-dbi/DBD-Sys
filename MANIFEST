@@ -17,6 +17,8 @@ lib/DBD/Sys/Plugin/Meta.pm
 lib/DBD/Sys/Plugin/Meta/AllTables.pm
 lib/DBD/Sys/Plugin/Unix.pm
 lib/DBD/Sys/Plugin/Unix/Groups.pm
+lib/DBD/Sys/Plugin/Unix/Logins.pm
+lib/DBD/Sys/Plugin/Unix/Lsof.pm
 lib/DBD/Sys/Plugin/Unix/Users.pm
 lib/DBD/Sys/Plugin/Win32.pm
 lib/DBD/Sys/Plugin/Win32/Groups.pm
@@ -31,11 +33,16 @@ MANIFEST
 MANIFEST.SKIP
 META.yml
 README
+sandbox/proc-time.pl
+sandbox/sys-utmp.pl
+sandbox/unix-lsof.pl
 t/001_load.t
 t/002_checktbls.t
 t/003_filesys.t
 t/004_process.t
 t/005_netinterface.t
 t/manifest.t
+t/pod-cm.t
 t/pod.t
+t/pod_coverage.t
 Todo

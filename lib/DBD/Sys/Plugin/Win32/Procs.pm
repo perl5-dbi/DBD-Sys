@@ -124,19 +124,22 @@ sub collectData
             $cli ||= "";
             $cli =~ s{^\S+\\}{};
             $cli =~ s{\s+$}{};
-            push( @data, [
-                  $procInfo->{ProcessId},
-                  $procInfo->{ParentProcessId} || 0,
-                  $uid,
-                  $procInfo->{SessionId} || 0,
-                  $cli || $procInfo->{Name} || "<dead>",
-                  $procInfo->{CreationDate},
-                  int( ( $procInfo->{KernelModeTime} || 0 ) + ( $procInfo->{UserModeTime} || 0 ) + .499 ),
-                  $procInfo->{VirtualSize} || $procInfo->{WorkingSetSize},
-                  $procInfo->{ExecutablePath},
-                  $procInfo->{_status} || $procInfo->{Status} || $procInfo->{ExecutionState},
-                  $procInfo->{ThreadCount} || 1,
-              ] );
+            push(
+                  @data,
+                  [
+                     $procInfo->{ProcessId},
+                     $procInfo->{ParentProcessId} || 0,
+                     $uid,
+                     $procInfo->{SessionId} || 0,
+                     $cli || $procInfo->{Name} || "<dead>",
+                     $procInfo->{CreationDate},
+                     int( ( $procInfo->{KernelModeTime} || 0 ) + ( $procInfo->{UserModeTime} || 0 ) + .499 ),
+                     $procInfo->{VirtualSize} || $procInfo->{WorkingSetSize},
+                     $procInfo->{ExecutablePath},
+                     $procInfo->{_status} || $procInfo->{Status} || $procInfo->{ExecutionState},
+                     $procInfo->{ThreadCount} || 1,
+                  ]
+                );
         }
     }
 

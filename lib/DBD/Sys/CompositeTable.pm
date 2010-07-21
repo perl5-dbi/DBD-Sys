@@ -146,17 +146,25 @@ my %compositedInfo;
 
 sub _pk_cmp_fail
 {
-    my ($pk, $epk) = @_;
-    ref($pk) eq ref($epk) or return sprintf( "Can't compare primary key type (%s) of '%s' with primary key type (%s) of '%s'", ref($epk) ? "\\" . ref($epk) : "SCALAR", "%s", ref($pk) ? "\\" . ref($pk) : "SCALAR", "%s" );
-    if( ref($pk) eq "" )
+    my ( $pk, $epk ) = @_;
+    ref($pk) eq ref($epk)
+      or return
+      sprintf( "Can't compare primary key type (%s) of '%s' with primary key type (%s) of '%s'",
+               ref($epk)      ? "\\" . ref($epk) : "SCALAR",
+               "%s", ref($pk) ? "\\" . ref($pk)  : "SCALAR", "%s" );
+    if ( ref($pk) eq "" )
     {
         $pk eq $epk and return;
-        return sprintf( "Primary key (%s) of '%s' differs from primary key (%s) of '%s'", DBI::neat($epk), "%s", DBI::neat($pk), "%s" );
+        return
+          sprintf( "Primary key (%s) of '%s' differs from primary key (%s) of '%s'",
+                   DBI::neat($epk), "%s", DBI::neat($pk), "%s" );
     }
-    elsif( ref($pk) eq "ARRAY" )
+    elsif ( ref($pk) eq "ARRAY" )
     {
         join( "\0", sort @$epk ) eq join( "\0", sort @$pk ) and return;
-        return sprintf( "Primary key (%s) of '%s' differs from primary key (%s) of '%s'", DBI::neat_list( $epk ), "%s", DBI::neat_list($pk), "%s" );
+        return
+          sprintf( "Primary key (%s) of '%s' differs from primary key (%s) of '%s'",
+                   DBI::neat_list($epk), "%s", DBI::neat_list($pk), "%s" );
     }
 
     croak "Invalid type for primary key: " . ref($pk);
@@ -261,10 +269,10 @@ sub collectData
     my $meta          = $self->{meta};
     my $compositeName = $meta->{composite_name};
     my $rowOffset     = 0;
-    my @primaryKeys   = (ref $meta->{primary_key}) ? @{$meta->{primary_key}} : ($meta->{primary_key});
+    my @primaryKeys   = ( ref $meta->{primary_key} ) ? @{ $meta->{primary_key} } : ( $meta->{primary_key} );
     foreach my $embedded ( @{ $meta->{embed} } )
     {
-        my @pkIdx         = map { $embedded->column_num( $_ ) } @primaryKeys;
+        my @pkIdx         = map { $embedded->column_num($_) } @primaryKeys;
         my $mergeCols     = $meta->{merge_cols}->{ blessed($embedded) };
         my $enhanceCols   = $meta->{enhance_cols}->{ blessed($embedded) };
         my $nextRowOffset = $rowOffset + scalar(@$mergeCols);
@@ -276,13 +284,13 @@ sub collectData
             $ref = $ref->{$pks} ||= [];
             if ( @{$ref} )
             {
-                if ( scalar( @{ $ref } ) == $nextRowOffset )
+                if ( scalar( @{$ref} ) == $nextRowOffset )
                 {
                     warn "primary key '" . $meta->{primary_key} . "' is not unique for " . blessed($embedded);
                 }
                 else
                 {
-                    push( @{ $ref }, @$row[@$mergeCols] );
+                    push( @{$ref}, @$row[@$mergeCols] );
                 }
             }
             else

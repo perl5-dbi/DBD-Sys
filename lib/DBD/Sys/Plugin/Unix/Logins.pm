@@ -126,24 +126,21 @@ sub collectData()
 
     if ($haveSysUtmp)
     {
-	my %params;
-	$self->{meta}->{filename} and $params{Filename} = $self->{attrs}->{filename};
+        my %params;
+        $self->{meta}->{filename} and $params{Filename} = $self->{attrs}->{filename};
         my $utmp = Sys::Utmp->new(%params);
-	my $id = 0;
+        my $id   = 0;
 
         while ( my $utent = $utmp->getutent() )
         {
-	    next unless $utent->ut_user;
+            next unless $utent->ut_user;
             push(
                   @data,
                   [
-                     $utent->ut_user,
-		     $utent->ut_id eq "" ? $id++ : $utent->ut_id,
-		     $utent->ut_line,
-		     $utent->ut_pid == -1 ? undef : $utent->ut_pid,
-                     $utent->ut_type,
-		     $utent->ut_host eq "" ? undef : $utent->ut_host,
-		     $utent->ut_time
+                     $utent->ut_user, $utent->ut_id eq "" ? $id++ : $utent->ut_id,
+                     $utent->ut_line, $utent->ut_pid == -1 ? undef : $utent->ut_pid,
+                     $utent->ut_type, $utent->ut_host eq "" ? undef : $utent->ut_host,
+                     $utent->ut_time
                   ]
                 );
         }
