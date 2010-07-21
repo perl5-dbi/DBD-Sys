@@ -30,11 +30,6 @@ as well as between volume groups or disks and file systems.
 All major packaging systems should be supported: rpm, dpkg, pkg (BSD), pkg
 (Solaris), lpp (AIX), sw_list (HP-UX), ...
 
-=item Open Files and Network Connections
-
-Open files of running processes (via lsof and netstat?), joinable with
-C<NETINT> and C<PROCS>, C<PWENT> and C<GRENT> ...
-
 =item More Networking Tables
 
 ... like routing information, firewall states, ...
