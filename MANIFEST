@@ -11,6 +11,7 @@ lib/DBD/Sys/Plugin.pm
 lib/DBD/Sys/Plugin/Any.pm
 lib/DBD/Sys/Plugin/Any/FileSys.pm
 lib/DBD/Sys/Plugin/Any/FileSysDf.pm
+lib/DBD/Sys/Plugin/Any/NetIfconfigWrapper.pm
 lib/DBD/Sys/Plugin/Any/NetInterface.pm
 lib/DBD/Sys/Plugin/Any/Procs.pm
 lib/DBD/Sys/Plugin/Meta.pm
@@ -33,14 +34,14 @@ MANIFEST
 MANIFEST.SKIP
 META.yml
 README
-sandbox/proc-time.pl
-sandbox/sys-utmp.pl
-sandbox/unix-lsof.pl
 t/001_load.t
 t/002_checktbls.t
 t/003_filesys.t
 t/004_process.t
 t/005_netinterface.t
+t/006_openfiles.t
+t/007_logonusers.t
+t/lib.pl
 t/manifest.t
 t/pod-cm.t
 t/pod.t

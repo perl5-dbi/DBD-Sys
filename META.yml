@@ -32,6 +32,8 @@ provides:
   DBD::Sys::Plugin::Any::FileSysDf:
     file: lib/DBD/Sys/Plugin/Any/FileSysDf.pm
     version: 0.02
+  DBD::Sys::Plugin::Any::NetIfconfigWrapper:
+    file: lib/DBD/Sys/Plugin/Any/NetIfconfigWrapper.pm
   DBD::Sys::Plugin::Any::NetInterface:
     file: lib/DBD/Sys/Plugin/Any/NetInterface.pm
   DBD::Sys::Plugin::Any::Procs:
