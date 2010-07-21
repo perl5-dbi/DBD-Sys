@@ -16,6 +16,7 @@ Revision history for Perl module DBD::Sys
     - add a second implementation for the netint table using
       Net::Ifconfig::Wrapper and (for calculating broadcase address)
       NetAddr::IP
+    - fixing duplicate group entries on FreeBSD (and maybe others)
 
 0.01 2010-05-14
     - original version; released to an unsuspecting world ...
