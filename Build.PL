@@ -48,6 +48,7 @@ my $build = Module::Build->new(
                                 recommends => {
                                                 'Net::Interface'         => '1.0012',
                                                 'Net::Ifconfig::Wrapper' => '0.11',
+						'NetAddr::IP'            => '4.028',
                                               },
                               },
             (

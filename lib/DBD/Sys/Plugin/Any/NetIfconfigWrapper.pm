@@ -25,12 +25,17 @@ $VERSION = "0.02";
 =cut
 
 my $haveNetIfconfigWrapper = 0;
+my $haveNetAddrIP = 0;
 eval {
     require Net::Ifconfig::Wrapper;
     $haveNetIfconfigWrapper = 1;
 };
+eval {
+    require NetAddr::IP;
+    $haveNetAddrIP = 1;
+};
 
-@colNames = qw(interface address_family address netmask hwaddress flags_bin flags);
+@colNames = qw(interface address_family address netmask broadcast hwaddress flags_bin flags);
 
 =head1 DESCRIPTION
 
@@ -126,10 +131,18 @@ sub collectData()
             {
                 while ( my ( $addr, $netmask ) = each %{ $ifdata->{inet} } )
                 {
+		    my $bcast;
+		    if( $haveNetAddrIP )
+		    {
+			# XXX let's see what happens when Net::Ifconfig::Wrapper::Ifconfig delivers IPv6 addresses ...
+			my $ip = NetAddr::IP->new( $addr, $netmask ); 
+			$bcast = $ip->broadcast();
+		    }
+
                     push(
                           @data,
                           [
-                             $interface, 'inet', $addr, $netmask, $ifdata->{ether}, $ifdata->{status},
+                             $interface, 'inet', $addr, $netmask, $bcast, $ifdata->{ether}, $ifdata->{status},
                              ( $ifdata->{status} ? '<up>' : '<down>' )
                           ]
                         );
@@ -140,7 +153,7 @@ sub collectData()
                 push(
                       @data,
                       [
-                         $interface, undef, undef, undef, $ifdata->{ether}, $ifdata->{status},
+                         $interface, undef, undef, undef, undef, $ifdata->{ether}, $ifdata->{status},
                          ( $ifdata->{status} ? '<up>' : '<down>' )
                       ]
                     );

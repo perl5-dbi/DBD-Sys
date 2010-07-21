@@ -35,7 +35,7 @@ sub proveRequirements
           : (
               qw(Sys::Filesystem Filesys::DfPortable Win32::DriveInfo),
               qw(Proc::ProcessTable Win32::Process::Info Win32::Process::CommandLine),
-              qw(Net::Interface Socket6 Net::Ifconfig::Wrapper),
+              qw(Net::Interface Socket6 Net::Ifconfig::Wrapper NetAddr::IP),
               qw(Sys::Utmp),
               qw(Unix::Lsof Sys::Filesystem::MountPoint),
             );

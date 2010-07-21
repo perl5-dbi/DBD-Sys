@@ -1,6 +1,6 @@
 Revision history for Perl module DBD::Sys
 
-0.02 2010-07-nn
+0.100 2010-07-21
     - rename columns which were reserved sql words for table procs
     - rework plugin-management and table-management:
 	* allow multiple implementors for one table
@@ -13,6 +13,9 @@ Revision history for Perl module DBD::Sys
     - add logins table to get a list of logged in users
     - add openfiles table
     - fix hwadress column in netint table to hwaddress
+    - add a second implementation for the netint table using
+      Net::Ifconfig::Wrapper and (for calculating broadcase address)
+      NetAddr::IP
 
 0.01 2010-05-14
     - original version; released to an unsuspecting world ...

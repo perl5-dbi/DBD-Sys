@@ -9,6 +9,4 @@ use Data::Dumper;
   my $Info = Net::Ifconfig::Wrapper::Ifconfig('list', '', '', '')
         or die $@;
 
-    or die $@;
-
 print Dumper $Info;
