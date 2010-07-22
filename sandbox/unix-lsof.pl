@@ -11,7 +11,7 @@ print Dumper $output;
 my @pids = keys %$output;
 my @commands = map { $_->{"command name"} } values %$output;
 
-( $output, $error ) = lsof(  );
+( $output, $error ) = lsof( "-p", "$$" );
 print Dumper $output;
 my @filenames;
 for my $pid ( keys %$output )
