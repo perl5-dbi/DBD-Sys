@@ -60,7 +60,7 @@ my $build = Module::Build->new(
                                  },
                   openfiles_table => {
                                        description => "Table containing open files",
-                                       requires    => { 'Unix::Lsof' => '0.0.9', },
+                                       requires    => { 'Unix::Lsof' => '0.0.5', },
                                        recommends  => { 'Sys::Filesystem::MountPoint' => '1.02', },
                                      },
                 )
