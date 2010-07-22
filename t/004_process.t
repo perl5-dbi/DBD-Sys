@@ -9,27 +9,6 @@ my @proved_vers = proveRequirements( [qw(Proc::ProcessTable Win32::Process::Info
 showRequirements( undef, $proved_vers[1] );
 plan( tests => 8 );
 
-my $table;
-
-my $found = 0;
-
-ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect 1' ) or diag($DBI::errstr);
-
-if ( $proved_vers[1]->{'Proc::ProcessTable'} )
-{
-    my $pt = Proc::ProcessTable->new();
-    $table = $pt->table();
-}
-elsif ( $proved_vers[1]->{'Win32::Process::Info'} )
-{
-    Win32::Process::Info->import( 'NT', 'WMI' );
-    $table = [ Win32::Process::Info->new()->GetProcInfo() ];
-}
-else
-{
-    $table = [];
-}
-
 BEGIN
 {
     if ( $^O eq 'MSWin32' )
@@ -53,6 +32,29 @@ else
     $username  = getpwuid($<);
     $groupid   = $(;
     $groupname = getgrgid($();
+}
+
+my $table;
+
+my $found = 0;
+
+ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect 1' ) or diag($DBI::errstr);
+
+if ( $proved_vers[1]->{'Proc::ProcessTable'} )
+{
+    my $pt = Proc::ProcessTable->new();
+    $table = $pt->table();
+    my @myprocs = grep { $_->uid() == $userid } @$table;
+    $table = \@myprocs;
+}
+elsif ( $proved_vers[1]->{'Win32::Process::Info'} )
+{
+    Win32::Process::Info->import( 'NT', 'WMI' );
+    $table = [ Win32::Process::Info->new()->GetProcInfo() ];
+}
+else
+{
+    $table = [];
 }
 
 ok( $st = $dbh->prepare("SELECT COUNT(uid) FROM procs WHERE procs.uid=$userid"), 'prepare process' )
