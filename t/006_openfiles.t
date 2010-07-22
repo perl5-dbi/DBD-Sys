@@ -20,7 +20,7 @@ my $found = 0;
 while ( $row = $st->fetchrow_arrayref() )
 {
     ok( $row->[0], 'open files found' );
-    $row->[0] eq $Config{perlpath} and ++$found;
+    (0 == index($row->[0], $Config{perlpath})) and ++$found;
 }
 ok( $found, "Found $Config{perlpath} in openfiles" );
 
