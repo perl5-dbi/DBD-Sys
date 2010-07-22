@@ -1,6 +1,7 @@
 # -*- perl -*-
 
 use Test::More;    # the number of the tests to run.
+use DBI;
 
 do "t/lib.pl";
 
@@ -12,7 +13,7 @@ my $table;
 
 my $found = 0;
 
-ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect 1' );
+ok( my $dbh = DBI->connect('DBI:Sys:'), 'connect 1' ) or diag($DBI::errstr);
 
 if ( $proved_vers[1]->{'Proc::ProcessTable'} )
 {
@@ -54,7 +55,8 @@ else
     $groupname = getgrgid($();
 }
 
-ok( $st = $dbh->prepare("SELECT COUNT(uid) FROM procs WHERE procs.uid=$userid"), 'prepare process' );
+ok( $st = $dbh->prepare("SELECT COUNT(uid) FROM procs WHERE procs.uid=$userid"), 'prepare process' )
+  or diag( $dbh->errstr );
 ok( my $num = $st->execute(), 'execute process' );
 SKIP:
 {
@@ -63,15 +65,15 @@ SKIP:
     ok( $row->[0], 'process found for current user' );
 }
 
-ok( $dbh = DBI->connect('DBI:Sys:'), 'connect 2' );
+ok( $dbh = DBI->connect('DBI:Sys:'), 'connect 2' ) or diag($DBI::errstr);
 ok(
     $st = $dbh->prepare(
         'SELECT username, COUNT(procs.uid) as process_ct FROM procs, pwent WHERE procs.uid = pwent.uid GROUP BY username'
     ),
     'prepare process join user'
-  );    # how many process per user
+  ) or diag( $dbh->errstr );    # how many process per user
 #print $st;
-ok( $num = $st->execute(), 'execute process join user' );
+ok( $num = $st->execute(), 'execute process join user' ) or diag( $st->errstr );
 SKIP:
 {
     skip( "OS seems to be unsupported", 1 ) unless scalar(@$table) > 0;

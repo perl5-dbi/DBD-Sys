@@ -2,6 +2,7 @@
 
 use Test::More tests => 7;    # the number of the tests to run.
 use FindBin qw($RealBin);     # class for getting the pathname.
+use DBI;
 
 do "t/lib.pl";
 
@@ -12,13 +13,14 @@ my $haveFilesysDfPortable = $proved_vers[1]->{'Filesys::DfPortable'};
 
 my $mountpt = '';
 
-ok( my $dbh = DBI->connect('DBI:Sys:sys_filesysdf_blocksize=1024'), 'connect' );
+ok( my $dbh = DBI->connect('DBI:Sys:sys_filesysdf_blocksize=1024'), 'connect' ) or diag($DBI::errstr);
 SKIP:
 {
     skip( 'Sys::Filesystem required for table filesystems', 3 ) unless ($haveSysFilesystem);
     ok( $st = $dbh->prepare('SELECT DISTINCT mountpoint, label, device FROM filesystems ORDER BY mountpoint'),
-        'prepare filesystems' );
-    ok( $num = $st->execute(), 'execute filesystems' );
+        'prepare filesystems' )
+      or diag( $dbh->errstr );
+    ok( $num = $st->execute(), 'execute filesystems' ) or diag( $st->errstr );
 
     my $found = 0;
 
@@ -42,8 +44,8 @@ SKIP:
             "SELECT DISTINCT mountpoint, blocks, bfree, bused FROM filesysdf WHERE mountpoint = '$mountpt' ORDER BY mountpoint"
         ),
         'prepare filesysdf'
-      );    # " instead of ' because $mountpoint needs to be evaluated!
-    ok( $num = $st->execute(), 'execute filesysdf' );
+      ) or diag( $dbh->errstr );    # " instead of ' because $mountpoint needs to be evaluated!
+    ok( $num = $st->execute(), 'execute filesysdf' ) or diag( $st->errstr );
 
     while ( $row = $st->fetchrow_hashref() )
     {

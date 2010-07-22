@@ -2,6 +2,7 @@
 
 use Test::More;
 use Params::Util qw(_HASH);
+use DBI;
 
 do "t/lib.pl";
 
@@ -28,8 +29,8 @@ else
     $groupname = getgrgid($();
 }
 
-ok( my $dbh = DBI->connect('DBI:Sys:'),                                      'connect 1' );
-ok( $st     = $dbh->prepare("SELECT COUNT(*) FROM logins WHERE username=?"), 'prepare logins' );
-ok( my $num = $st->execute($username),                                       'execute logins' );
+ok( my $dbh = DBI->connect('DBI:Sys:'),                                      'connect 1' )      or diag($DBI::errstr);
+ok( $st     = $dbh->prepare("SELECT COUNT(*) FROM logins WHERE username=?"), 'prepare logins' ) or diag( $dbh->errstr );
+ok( my $num = $st->execute($username),                                       'execute logins' ) or diag( $st->errstr );
 $row = $st->fetchrow_arrayref();
 ok( $row->[0], 'login found' );
