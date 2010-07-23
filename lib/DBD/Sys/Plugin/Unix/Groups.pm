@@ -6,7 +6,7 @@ use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
-$VERSION  = "0.02";
+$VERSION  = "0.100";
 @colNames = qw(groupname grpass gid members);
 
 =pod

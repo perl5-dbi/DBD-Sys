@@ -86,7 +86,7 @@ use Module::Pluggable::Object;
 use Scalar::Util qw(blessed);
 use Params::Util qw(_ARRAY);
 
-$VERSION = "0.02";
+$VERSION = "0.100";
 
 =pod
 

@@ -31,7 +31,7 @@ use Module::Pluggable
   inner       => 0,
   only        => qr/^DBD::Sys::Plugin::\p{Word}+$/;
 
-$VERSION = "0.02";
+$VERSION = "0.100";
 
 =head1 DESCRIPTION
 

@@ -17,7 +17,7 @@ require SQL::Eval;
 require DBI::DBD::SqlEngine;
 
 @ISA     = qw(DBI::DBD::SqlEngine::Table);
-$VERSION = 0.02;
+$VERSION = 0.100;
 
 =head1 DESCRIPTION
 

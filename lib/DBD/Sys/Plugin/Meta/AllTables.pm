@@ -24,7 +24,7 @@ DBD::Sys::Plugin::Meta::AllTables - DBD::Sys Table Overview
 =cut
 
 @colNames = qw(table_qualifier table_owner table_name table_type remarks);
-$VERSION  = "0.02";
+$VERSION  = "0.100";
 
 =head1 DESCRIPTION
 
