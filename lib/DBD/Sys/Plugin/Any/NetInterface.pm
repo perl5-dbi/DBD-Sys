@@ -156,9 +156,8 @@ sub collectData()
 
                 foreach my $afname ( sort @{ $Net::Interface::EXPORT_TAGS{afs} } )
                 {
-                    no strict;
-                    my $af = eval { &$afname() + 0; };
-                    use strict;
+		    my $affn = Net::Interface->can($afname);
+		    my $af = $affn ? &{$affn}() + 0 : undef;
 
                     next unless ( defined($af) );
 
