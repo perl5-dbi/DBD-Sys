@@ -1,5 +1,8 @@
 Revision history for Perl module DBD::Sys
 
+0.101 2010-07-25
+    - fix tests to run only when all dependencies are satisfied
+
 0.100 2010-07-21
     - rename columns which were reserved sql words for table procs
     - rework plugin-management and table-management:
