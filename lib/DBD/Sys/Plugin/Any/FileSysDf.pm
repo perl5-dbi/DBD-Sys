@@ -32,7 +32,7 @@ eval {
 };
 Filesys::DfPortable->import() if ($haveFilesysDf);
 
-$VERSION  = "0.100";
+$VERSION  = "0.101";
 @colNames = qw(mountpoint blocks bfree bavail bused bper files ffree favail fused fper);
 
 =head1 DESCRIPTION

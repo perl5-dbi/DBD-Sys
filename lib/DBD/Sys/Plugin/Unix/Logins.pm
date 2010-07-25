@@ -6,7 +6,7 @@ use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
-$VERSION  = "0.100";
+$VERSION  = "0.101";
 @colNames = qw(username id line pid type host timestamp);
 
 my $haveSysUtmp = 0;
