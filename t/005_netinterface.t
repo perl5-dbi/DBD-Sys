@@ -10,7 +10,8 @@ my @proved_vers = proveRequirements( [qw(Net::Interface Net::Ifconfig::Wrapper N
 showRequirements( undef, $proved_vers[1] );
 
 plan( skip_all => "Net::Interface > 1.0 or Net::Ifconfig::Wrapper >= 0.11 required for this test" )
-  unless ( defined( _HASH( $proved_vers[1] ) ) );
+  unless ( defined( _HASH( $proved_vers[1] ) )
+      && ( defined( $proved_vers[1]->{'Net::Interface'} ) || defined( $proved_vers[1]->{'Net::Ifconfig::Wrapper'} ) ) );
 plan( tests => 4 );
 
 ok( my $dbh = DBI->connect('DBI:Sys:'),                             'connect 1' )          or diag($DBI::errstr);
