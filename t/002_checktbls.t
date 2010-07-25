@@ -5,8 +5,6 @@ use DBI;
 
 do "t/lib.pl";
 
-my @proved_vers = proveRequirements( [qw(Sys::Filesystem Filesys::DfPortable)] );
-
 BEGIN
 {
     if ( $^O eq 'MSWin32' )
