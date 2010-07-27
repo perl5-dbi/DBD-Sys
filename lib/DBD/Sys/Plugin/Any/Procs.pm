@@ -157,21 +157,21 @@ Scheduling class name                 #FIX ME!
 
 =head1 METHODS
 
-=head2 getColNames
+=head2 get_col_names
 
 Returns the column names of the table as named in L</Columns>
 
 =cut
 
-sub getColNames() { @colNames }
+sub get_col_names() { @colNames }
 
-=head2 getPrimaryKey
+=head2 get_primary_key
 
 Returns 'pid' - which is the process identifier.
 
 =cut
 
-sub getPrimaryKey() { return 'pid'; }
+sub get_primary_key() { return 'pid'; }
 
 my %colMap = (
                fulltime => 'time',
@@ -193,13 +193,13 @@ sub _init_knownCols
     }
 }
 
-=head2 collectData
+=head2 collect_data
 
 Retrieves the data from L<Proc::ProcessTable> and put it into fetchable rows.
 
 =cut
 
-sub collectData()
+sub collect_data()
 {
     my @data;
 

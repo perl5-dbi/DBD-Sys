@@ -27,7 +27,7 @@ actions.
 
 =head1 METHODS
 
-=head2 getColNames
+=head2 get_col_names
 
 This method is called during the construction phase of the table. It must be
 a I<static> method - the called context is the class name of the constructed
@@ -35,34 +35,34 @@ object.
 
 =cut
 
-sub getColNames() { croak "Abstract method 'getColNames' called"; }
+sub get_col_names() { croak "Abstract method 'get_col_names' called"; }
 
-=head2 collectData
+=head2 collect_data
 
 This method is called when the table is constructed but before the first row
 shall be delivered via C<fetch_row()>.
 
 =cut
 
-sub collectData() { croak "Abstract method 'collectData' called"; }
+sub collect_data() { croak "Abstract method 'collect_data' called"; }
 
-=head2 getPrimaryKey
+=head2 get_primary_key
 
 This method returns the column name of the primary key column. If not
 overwritten, the first column name is returned by C<DBD::Sys::Table>.
 
 =cut
 
-sub getPrimaryKey() { return ( $_[0]->getColNames() )[0]; }
+sub get_primary_key() { return ( $_[0]->get_col_names() )[0]; }
 
-=head2 getTableName
+=head2 get_table_name
 
 Returns the name of the table based on it's class name.
 Override it to return another table name.
 
 =cut
 
-sub getTableName
+sub get_table_name
 {
     my $self = $_[0];
     my $proto = blessed($self) || $self;
@@ -73,30 +73,30 @@ sub getTableName
     return $tblName;
 }
 
-=head2 getPriority
+=head2 get_priority
 
 Returns the default priority of the controlling plugin.
 
-To speed up subsequent getPriority calls, a simple method returning the
+To speed up subsequent get_priority calls, a simple method returning the
 value is injected into the class name space.
 
 =cut
 
-sub getPriority()
+sub get_priority()
 {
     my $self = $_[0];
     my $proto = blessed($self) || $self;
     ( my $plugin = $proto ) =~ s/(.*)::\p{Word}+$/$1/;
-    my $priority = $plugin->getPriority();
+    my $priority = $plugin->get_priority();
 
-    eval sprintf( 'sub %s::getPriority { return %d; }', $proto, $priority );
+    eval sprintf( 'sub %s::get_priority { return %d; }', $proto, $priority );
 
     return $priority;
 }
 
 =head2 new
 
-Constructor - called from C<DBD::Sys::PluginManager::getTable> when called
+Constructor - called from C<DBD::Sys::PluginManager::get_table> when called
 from C<SQL::Statement::open_tables> for tables with one implementor class.
 The C<$attrs> argument contains the owner statement instance in the field
 C<owner> and the owning database handle in the field <database>.
@@ -111,11 +111,11 @@ sub new
                   %$attrs,
                 );
     exists $table{col_names}
-      or $table{col_names} = [ $className->getColNames() ];
+      or $table{col_names} = [ $className->get_col_names() ];
 
     my $self = $className->SUPER::new( \%table );
 
-    $self->{data} = $self->collectData();
+    $self->{data} = $self->collect_data();
 
     return $self;
 }

@@ -66,7 +66,7 @@ This will fetch the column names from both embedded tables and get (simplfied):
   # );
   # $primaryKey = 'pid';
 
-The merge phase in C<collectData()> finally does (let's assume running
+The merge phase in C<collect_data()> finally does (let's assume running
 in a cygwin environment, where Proc::ProcessTable and Win32::Process::Info
 both are working):
 
@@ -175,7 +175,7 @@ sub new
     my ( $proto, $tableInfo, $attrs ) = @_;
 
     my @tableClasses =
-      sort { ( $a->getPriority() <=> $b->getPriority() ) || ( blessed($a) cmp blessed($b) ) } @$tableInfo;
+      sort { ( $a->get_priority() <=> $b->get_priority() ) || ( blessed($a) cmp blessed($b) ) } @$tableInfo;
 
     my $compositeName = join( "-", @tableClasses );
     my ( @embed, %allColNames, @allColNames, $allColIdx, %mergeCols, %enhanceCols, $primaryKey );
@@ -187,10 +187,10 @@ sub new
         push( @embed, $embedded );
         next if ( defined( $compositedInfo{$compositeName} ) );
 
-        my @embedColNames = $embedded->getColNames();
+        my @embedColNames = $embedded->get_col_names();
         if ($allColIdx)
         {
-            my $embedPK = $embedded->getPrimaryKey();
+            my $embedPK = $embedded->get_primary_key();
             my $pkFailure = _pk_cmp_fail( $primaryKey, $embedPK );
             $pkFailure and croak( sprintf( $pkFailure, $tblClass, join( ", ", keys %mergeCols ) ) );
             $mergeCols{$tblClass} = [];
@@ -214,7 +214,7 @@ sub new
             %allColNames          = map { $_ => $allColIdx++ } @embedColNames;
             @allColNames          = @embedColNames;
             $mergeCols{$tblClass} = [ 0 .. $#embedColNames ];
-            $primaryKey           = $embedded->getPrimaryKey();
+            $primaryKey           = $embedded->get_primary_key();
         }
     }
 
@@ -238,7 +238,7 @@ sub new
     return $proto->SUPER::new($attrs);
 }
 
-=head2 getColNames
+=head2 get_col_names
 
 This method is called during the construction phase of the table. It must be
 a I<static> method - the called context is the class name of the constructed
@@ -246,12 +246,12 @@ object.
 
 =cut
 
-sub getColNames
+sub get_col_names
 {
     return @{ $_[0]->{col_names} };
 }
 
-=head2 collectData
+=head2 collect_data
 
 Merges the collected data by the embedded tables into one composed list
 of rows. This list of rows will be delivered to C<SQL::Statement> when
@@ -261,7 +261,7 @@ The merge phase is demonstrated in the example in L</DESCRIPTION>.
 
 =cut
 
-sub collectData
+sub collect_data
 {
     my $self = $_[0];
     my %data;

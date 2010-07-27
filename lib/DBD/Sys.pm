@@ -121,7 +121,7 @@ sub init_default_attributes
 
     $dbh->{sys_pluginmgr_class} = "DBD::Sys::PluginManager";
     $dbh->{sys_pluginmgr}       = DBD::Sys::PluginManager->new();
-    $dbh->{sys_plugin_attrs}    = $dbh->{sys_pluginmgr}->getTablesAttrs();
+    $dbh->{sys_plugin_attrs}    = $dbh->{sys_pluginmgr}->get_tables_attrs();
     foreach my $plugin_attr ( keys %{ $dbh->{sys_plugin_attrs} } )
     {
         $dbh->{sys_valid_attrs}->{$plugin_attr} = 1;
@@ -149,7 +149,7 @@ sub STORE ($$$)
     {
         $@ = undef;
         $dbh->{sys_pluginmgr} = $dbh->{sys_pluginmgr_class}->new();
-        my $sys_plugin_attrs = $dbh->{sys_pluginmgr}->getTablesAttrs();
+        my $sys_plugin_attrs = $dbh->{sys_pluginmgr}->get_tables_attrs();
 
         foreach my $plugin_attr ( keys %{$sys_plugin_attrs} )
         {
@@ -232,7 +232,7 @@ sub open_table($$$$$)
     weaken( $attrs->{owner} );
     weaken( $attrs->{database} );
 
-    my $tbl = $dbh->{sys_pluginmgr}->getTable( $table, $attrs );
+    my $tbl = $dbh->{sys_pluginmgr}->get_table( $table, $attrs );
 
     return $tbl;
 }
@@ -351,7 +351,7 @@ primary key is I<mountpoint> - and if any additional module provides
 another implementation (with data from another module than
 C<Sys::Filesystem>), it needs to ensure that the column I<mountpoint>
 is provided and unique. Additionally it must return I<mountpoint> as
-primary key when it's method C<getPrimaryKey> is invoked.
+primary key when it's method C<get_primary_key> is invoked.
 
 =head1 AUTHOR
 

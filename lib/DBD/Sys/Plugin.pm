@@ -25,7 +25,7 @@ plugins.
 =head2 Plugin structure
 
 Each plugin must be named C<DBD::Sys::Plugin::>I<Plugin-Name>. This package
-can provide an external callable method named C<getSupportedTables> which
+can provide an external callable method named C<get_supported_tables> which
 must return a hash containing the provided tables as key and the classes which
 implement the tables as associated value, e.g.:
 
@@ -33,7 +33,7 @@ implement the tables as associated value, e.g.:
 
   use base qw(DBD::Sys::Plugin);
 
-  sub getSupportedTables()
+  sub get_supported_tables()
   {
       (
           mytable => 'DBD::Sys::Plugin::Foo::MyTable';
@@ -42,12 +42,12 @@ implement the tables as associated value, e.g.:
 
 If the table is located in additional module, it must be required either by
 the plugin package on loading or at least when it's returned by
-C<getSupportedTables>.
+C<get_supported_tables>.
 
 If this method is not provided, the namespace below the plugin name will
 be scanned for tables using L<Module::Pluggable::Object>:
 
-  sub DBD::Sys::Plugin::getSupportedTables
+  sub DBD::Sys::Plugin::get_supported_tables
   {
       my $proto = blessed($_[0]) || $_[0];
       my $finder = Module::Pluggable::Object->new(
@@ -61,16 +61,16 @@ be scanned for tables using L<Module::Pluggable::Object>:
 
 It's strongly recommended to derive the table classes from
 L<DBD::Sys::Table>, but it's required that it is a
-L<SQL::Eval::Table|SQL::Eval> and provides the C<getColNames> and
-C<collectData> methods:
+L<SQL::Eval::Table|SQL::Eval> and provides the C<get_col_names> and
+C<collect_data> methods:
 
   package DBD::Sys::Plugin::Foo::MyTable;
 
   use base qw(DBD::Sys::Table);
 
-  sub getColNames() { qw(col1 col2 col3) }
+  sub get_col_names() { qw(col1 col2 col3) }
 
-  sub collectData()
+  sub collect_data()
   {
       # ...
 
@@ -92,7 +92,7 @@ $VERSION = "0.102";
 
 =head1 METHODS
 
-=head2 getSupportedTables
+=head2 get_supported_tables
 
 This method is using L<Module::Pluggable::Object> to find all tables in
 the namespace of the class derived from C<DBD::Sys::Plugin>. It's called
@@ -104,7 +104,7 @@ static hash.
 
 =cut
 
-sub getSupportedTables
+sub get_supported_tables
 {
     my $self = $_[0];
     my $proto = blessed($self) || $self;
@@ -119,7 +119,7 @@ sub getSupportedTables
     foreach my $tblClass (@tblClasses)
     {
         my $tblName;
-        $tblClass->can('getTableName') and $tblName = $tblClass->getTableName();
+        $tblClass->can('get_table_name') and $tblName = $tblClass->get_table_name();
         $tblName or ( ( $tblName = $tblClass ) =~ s/.*::(\p{Word}+)$/$1/ );
         exists $supportedTables{$tblName}
           and !defined( _ARRAY( $supportedTables{$tblName} ) )
@@ -131,7 +131,7 @@ sub getSupportedTables
     return %supportedTables;
 }
 
-=head2 getPriority
+=head2 get_priority
 
 This method returns the default priority of a plugin (and table): 1000.
 See L<DBD::Sys::CompositeTable/new> for more information about priorities
@@ -139,7 +139,7 @@ of plugin and table classes.
 
 =cut
 
-sub getPriority { return 1000; }
+sub get_priority { return 1000; }
 
 =head1 AUTHOR
 

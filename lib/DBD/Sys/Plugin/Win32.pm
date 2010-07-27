@@ -42,13 +42,13 @@ for details.
 
 =head1 METHODS
 
-=head2 getPriority
+=head2 get_priority
 
 Returns the default priority for win32 tables, 500.
 
 =cut
 
-sub getPriority() { return 500; }
+sub get_priority() { return 500; }
 
 =head1 PREREQUISITES
 

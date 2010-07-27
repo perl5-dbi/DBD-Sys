@@ -74,33 +74,33 @@ Account expiration time, when available
 
 =head1 METHODS
 
-=head2 getTableName
+=head2 get_table_name
 
 Returns 'pwent'.
 
 =cut
 
-sub getTableName() { return 'pwent'; }
+sub get_table_name() { return 'pwent'; }
 
-=head2 getColNames
+=head2 get_col_names
 
 Returns the column names of the table as named in L</Columns>
 
 =cut
 
-sub getColNames() { @colNames }
+sub get_col_names() { @colNames }
 
 my $havepwent = 0;
 
 eval { setpwent(); my @pwentry = getpwent(); endpwent(); $havepwent = 1; };
 
-=head2 collectData
+=head2 collect_data
 
 Retrieves the data from the password database and put it into fetchable rows.
 
 =cut
 
-sub collectData()
+sub collect_data()
 {
     my @data;
 

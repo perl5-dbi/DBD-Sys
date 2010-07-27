@@ -74,21 +74,21 @@ The time in epoch seconds which the record was created.
 
 =head1 METHODS
 
-=head2 getTableName
+=head2 get_table_name
 
 Returns 'logins'.
 
 =cut
 
-sub getTableName() { return 'logins'; }
+sub get_table_name() { return 'logins'; }
 
-=head2 getColNames
+=head2 get_col_names
 
 Returns the column names of the table as named in L</Columns>
 
 =cut
 
-sub getColNames() { @colNames }
+sub get_col_names() { @colNames }
 
 =head2 getAttributes
 
@@ -105,21 +105,21 @@ and will use C<_PATH_UTMP>.
 
 sub getAttributes() { return qw(filename) }
 
-=head2 getPrimaryKey
+=head2 get_primary_key
 
 Returns 'timestamp' - you must be very quick to login twice per second
 
 =cut
 
-sub getPrimaryKey() { return 'timestamp'; }
+sub get_primary_key() { return 'timestamp'; }
 
-=head2 collectData
+=head2 collect_data
 
 Retrieves the data from the utmp database and put it into fetchable rows.
 
 =cut
 
-sub collectData()
+sub collect_data()
 {
     my $self = $_[0];
     my @data;

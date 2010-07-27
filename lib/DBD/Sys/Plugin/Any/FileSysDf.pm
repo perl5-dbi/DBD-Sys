@@ -98,13 +98,13 @@ See the information for the C<bper> column.
 
 =head1 METHODS
 
-=head2 getColNames
+=head2 get_col_names
 
 Returns the column names of the table as named in L</Columns>
 
 =cut
 
-sub getColNames() { return @colNames }
+sub get_col_names() { return @colNames }
 
 =head2 getAttributes
 
@@ -121,7 +121,7 @@ This defaults to 1.
 
 sub getAttributes() { return qw(blocksize) }
 
-=head2 collectData
+=head2 collect_data
 
 Retrieves the mountpoints of mounted file systems from L<Sys::Filesystem>
 and determine the free space on their devices using L<Filesys::DfPortable>.
@@ -129,7 +129,7 @@ The mountpoint and the free space information are put in fetchable rows.
 
 =cut
 
-sub collectData()
+sub collect_data()
 {
     my $self = $_[0];
     my @data;

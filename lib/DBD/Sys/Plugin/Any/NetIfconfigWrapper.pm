@@ -79,45 +79,45 @@ Comma separated list of the flags.
 
 =head1 METHODS
 
-=head2 getTableName
+=head2 get_table_name
 
 Returns 'netint'.
 
 =cut
 
-sub getTableName() { return 'netint'; }
+sub get_table_name() { return 'netint'; }
 
-=head2 getColNames
+=head2 get_col_names
 
 Returns the column names of the table as named in L</Columns>
 
 =cut
 
-sub getColNames() { @colNames }
+sub get_col_names() { @colNames }
 
-=head2 getPrimaryKey
+=head2 get_primary_key
 
 Returns 'address'.
 
 =cut
 
-sub getPrimaryKey() { return [qw(interface address_family address)]; }
+sub get_primary_key() { return [qw(interface address_family address)]; }
 
-=head2 getPriority
+=head2 get_priority
 
 Returns 200 to let L<DBD::Sys::Plugin::Any::NetInterface> dominate.
 
 =cut
 
-sub getPriority() { return 200; }
+sub get_priority() { return 200; }
 
-=head2 collectData
+=head2 collect_data
 
 Retrieves the data from L<Net::Interface> and put it into fetchable rows.
 
 =cut
 
-sub collectData()
+sub collect_data()
 {
     my @data;
 

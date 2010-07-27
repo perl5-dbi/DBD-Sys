@@ -38,21 +38,21 @@ require DBD::Sys::Plugin::Meta::AllTables;
 
 my %supportedTables = ( alltables => 'DBD::Sys::Plugin::Meta::AllTables', );
 
-=head2 getSupportedTables
+=head2 get_supported_tables
 
 Delivers the supported meta tables.
 
 =cut
 
-sub getSupportedTables() { %supportedTables }
+sub get_supported_tables() { %supportedTables }
 
-=head2 getPriority
+=head2 get_priority
 
 Delivers the default priority for the meta tables, which is 100.
 
 =cut
 
-sub getPriority { return 100; }
+sub get_priority { return 100; }
 
 =head1 PREREQUISITES
 
