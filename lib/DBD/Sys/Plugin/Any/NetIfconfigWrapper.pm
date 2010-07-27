@@ -24,16 +24,8 @@ $VERSION = "0.02";
 
 =cut
 
-my $haveNetIfconfigWrapper = 0;
-my $haveNetAddrIP = 0;
-eval {
-    require Net::Ifconfig::Wrapper;
-    $haveNetIfconfigWrapper = 1;
-};
-eval {
-    require NetAddr::IP;
-    $haveNetAddrIP = 1;
-};
+my $haveNetIfconfigWrapper;
+my $haveNetAddrIP;
 
 @colNames = qw(interface address_family address netmask broadcast hwaddress flags_bin flags);
 
@@ -120,6 +112,24 @@ Retrieves the data from L<Net::Interface> and put it into fetchable rows.
 sub collect_data()
 {
     my @data;
+
+    unless( defined( $haveNetIfconfigWrapper ) )
+    {
+	$haveNetIfconfigWrapper = 0;
+	eval {
+	    require Net::Ifconfig::Wrapper;
+	    $haveNetIfconfigWrapper = 1;
+	};
+    }
+
+    unless( defined( $haveNetAddrIP ) )
+    {
+	$haveNetAddrIP = 0;
+	eval {
+	    require NetAddr::IP;
+	    $haveNetAddrIP = 1;
+	};
+    }
 
     if ($haveNetIfconfigWrapper)
     {

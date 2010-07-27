@@ -24,12 +24,7 @@ $VERSION = "0.02";
 
 =cut
 
-my $haveNetInterface = 0;
-eval {
-    require Net::Interface;
-    require Socket6;
-    $haveNetInterface = 1;
-};
+my $haveNetInterface;
 
 @colNames = qw(interface address_family address netmask broadcast hwaddress flags_bin flags mtu metric);
 
@@ -107,23 +102,19 @@ Returns 'address'.
 
 sub get_primary_key() { return [qw(interface address_family address)]; }
 
-$haveNetInterface and *_getflags = sub {
+my %flagconsts;
+
+sub _getflags
+{
     my $flags = $_[0] || 0;
-    my $txt = ( $flags & Net::Interface::IFF_UP() ) ? '<up' : '<down';
-    foreach my $iffname ( sort @{ $Net::Interface::EXPORT_TAGS{iffs} } )
+    my $txt = ( $flags & $flagconsts{up} ) ? '<up' : '<down';
+    foreach my $nm (keys %flagconsts)
     {
-        no strict;
-        my $v = eval { &$iffname() + 0; };
-        next if $v == eval ' Net::Interface::IFF_UP ';
-        if ( $flags & $v )
-        {
-            my $x = eval { &$iffname(); };
-            $txt .= ' ' . $x;
-        }
-        use strict;
+	$nm eq 'up' and next;
+        $flags & $flagconsts{$nm} and $txt .= ' ' . $nm;
     }
     $txt .= '>';
-};
+}
 
 =head2 collect_data
 
@@ -134,6 +125,27 @@ Retrieves the data from L<Net::Interface> and put it into fetchable rows.
 sub collect_data()
 {
     my @data;
+
+    unless( defined($haveNetInterface) )
+    {
+	$haveNetInterface = 0;
+	eval {
+	    require Net::Interface;
+	    require Socket6;
+	    $haveNetInterface = 1;
+	};
+
+	if( $haveNetInterface )
+	{
+	    foreach my $iffname ( sort @{ $Net::Interface::EXPORT_TAGS{iffs} } )
+	    {
+		my $iffn = Net::Interface->can($iffname);
+		my $val = &{$iffn}() + 0;
+		my $nm = &{$iffn}();
+		$flagconsts{$nm} = $val;
+	    }
+	}
+    }
 
     if ($haveNetInterface)
     {
@@ -150,9 +162,9 @@ sub collect_data()
             }
             else                                                                          # flags found
             {
-                my $mac    = ( defined $if->{mac} )    ? "\n\tMAC: " . Net::Interface::mac_bin2hex( $if->{mac} ) : '';
-                my $mtu    = $if->{mtu}                ? 'MTU:' . $if->{mtu}                                     : '';
-                my $metric = ( defined $if->{metric} ) ? 'Metric:' . $if->{metric}                               : '';
+                my $mac    = ( defined $if->{mac} )    ? Net::Interface::mac_bin2hex( $if->{mac} ) : undef;
+                my $mtu    = $if->{mtu}                ? $if->{mtu}                                     : undef;
+                my $metric = ( defined $if->{metric} ) ? $if->{metric}                               : undef;
 
                 foreach my $afname ( sort @{ $Net::Interface::EXPORT_TAGS{afs} } )
                 {

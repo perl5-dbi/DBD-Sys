@@ -24,15 +24,12 @@ DBD::Sys::Plugin::Any::Procs - provides a table containing running processes
 =cut
 
 $VERSION = "0.102";
-@colNames =
-  qw(uid gid euid egid pid ppid pgrp sess priority ttynum flags fulltime ctime virtsize rss wchan fname start pctcpu state pctmem cmndline ttydev);
+@colNames = (
+  qw(uid gid euid egid pid ppid pgrp sess priority ttynum flags),
+  qw(fulltime ctime virtsize rss wchan fname start),
+  qw(pctcpu state pctmem cmndline ttydev));
 
-my $haveProcProcessTable = 0;
-
-eval {
-    require Proc::ProcessTable;
-    $haveProcProcessTable = 1;
-};
+my $haveProcProcessTable;
 
 my %knownCols;
 
@@ -202,6 +199,15 @@ Retrieves the data from L<Proc::ProcessTable> and put it into fetchable rows.
 sub collect_data()
 {
     my @data;
+
+    unless( defined($haveProcProcessTable) )
+    {
+	$haveProcProcessTable = 0;
+	eval {
+	    require Proc::ProcessTable;
+	    $haveProcProcessTable = 1;
+	};
+    }
 
     if ($haveProcProcessTable)
     {

@@ -77,12 +77,7 @@ Amount of threads used by this process
 
 =cut
 
-my ( $have_win32_process_info, $have_win32_process_commandline ) = ( 0, 0 );
-eval { require Win32::Process::Info;        $have_win32_process_info        = 1; };
-eval { require Win32::Process::CommandLine; $have_win32_process_commandline = 1; };
-
-Win32::Process::Info->import( 'NT', 'WMI' ) if ($have_win32_process_info);
-Win32::Process::CommandLine->import() if ($have_win32_process_commandline);
+my ( $have_win32_process_info, $have_win32_process_commandline );
 
 =head1 METHODS
 
@@ -112,6 +107,16 @@ sub collect_data
 {
     my $self = $_[0];
     my @data;
+
+    unless( defined($have_win32_process_info) )
+    {
+	( $have_win32_process_info, $have_win32_process_commandline ) = ( 0, 0 );
+	eval { require Win32::Process::Info;        $have_win32_process_info        = 1; };
+	eval { require Win32::Process::CommandLine; $have_win32_process_commandline = 1; };
+
+	Win32::Process::Info->import( 'NT', 'WMI' ) if ($have_win32_process_info);
+	Win32::Process::CommandLine->import() if ($have_win32_process_commandline);
+    }
 
     if ($have_win32_process_info)
     {

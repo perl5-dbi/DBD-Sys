@@ -9,11 +9,7 @@ use base qw(DBD::Sys::Table);
 $VERSION  = "0.102";
 @colNames = qw(username id line pid type host timestamp);
 
-my $haveSysUtmp = 0;
-eval {
-    require Sys::Utmp;
-    $haveSysUtmp = 1;
-};
+my $haveSysUtmp;
 
 =pod
 
@@ -123,6 +119,15 @@ sub collect_data()
 {
     my $self = $_[0];
     my @data;
+
+    unless( defined($haveSysUtmp) )
+    {
+	$haveSysUtmp = 0;
+	eval {
+	    require Sys::Utmp;
+	    $haveSysUtmp = 1;
+	};
+    }
 
     if ($haveSysUtmp)
     {

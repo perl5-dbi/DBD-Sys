@@ -121,16 +121,8 @@ parameter).
 
 sub get_attributes() { return qw(uids pids filesys) }
 
-my $havelsof            = 0;
-my $havesysfsmountpoint = 0;
-eval {
-    require Unix::Lsof;
-    $havelsof = 1;
-};
-eval {
-    require Sys::Filesystem::MountPoint;
-    $havesysfsmountpoint = 1;
-};
+my $havelsof;
+my $havesysfsmountpoint;
 
 =head2 collect_data
 
@@ -142,6 +134,24 @@ sub collect_data()
 {
     my $self = $_[0];
     my @data;
+
+    unless( defined($havelsof) )
+    {
+$havelsof            = 0;
+eval {
+    require Unix::Lsof;
+    $havelsof = 1;
+};
+    }
+
+    unless( defined($havesysfsmountpoint) )
+    {
+$havesysfsmountpoint = 0;
+eval {
+    require Sys::Filesystem::MountPoint;
+    $havesysfsmountpoint = 1;
+};
+    }
 
     if ($havelsof)
     {

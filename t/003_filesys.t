@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-use Test::More tests => 7;    # the number of the tests to run.
+use Test::More tests => 10;    # the number of the tests to run.
 use FindBin qw($RealBin);     # class for getting the pathname.
 use DBI;
 
@@ -51,5 +51,25 @@ SKIP:
     {
         cmp_ok( $row->{bfree} + $row->{bused},
                 '==', $row->{blocks}, 'free blocks + used blocks = total blocks in filesysdf' );
+    }
+}
+
+SKIP:
+{
+    skip( 'Sys::Filesystem and Filesys::DfPortable required for table filesysdf', 3 )
+      unless ( $haveSysFilesystem and $haveFilesysDfPortable );
+    $dbh->{sys_filesysdf_blocksize} = 1;
+    ok(
+        $st = $dbh->prepare(
+            "SELECT DISTINCT mountpoint, blocks, bfree, bused FROM filesysdf WHERE mountpoint = '$mountpt' ORDER BY mountpoint"
+        ),
+        'prepare filesysdf (blocksize=1)'
+      ) or diag( $dbh->errstr );    # " instead of ' because $mountpoint needs to be evaluated!
+    ok( $num = $st->execute(), 'execute filesysdf (blocksize=1)' ) or diag( $st->errstr );
+
+    while ( $row = $st->fetchrow_hashref() )
+    {
+        cmp_ok( $row->{bfree} + $row->{bused},
+                '==', $row->{blocks}, 'free blocks + used blocks = total blocks in filesysdf (blocksize=1)' );
     }
 }

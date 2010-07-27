@@ -1,5 +1,12 @@
 Revision history for Perl module DBD::Sys
 
+0.102
+    - fix alltables for tables with multiple implementors
+    - rename camelCase functions into lower_case functions on request of
+      Matt S. Trout (MSTROUT)
+    - add lazy loading of required modules for table content on request of
+      Matt S. Trout (MSTROUT)
+
 0.101 2010-07-25
     - fix tests to run only when all dependencies are satisfied
 

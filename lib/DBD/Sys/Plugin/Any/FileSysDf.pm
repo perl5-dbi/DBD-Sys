@@ -24,13 +24,7 @@ DBD::Sys::Plugin::Any::FileSysDf - provides a table containing the free space of
 
 =cut
 
-my $haveFilesysDf = 0;
-eval {
-    require Sys::Filesystem;
-    require Filesys::DfPortable;
-    $haveFilesysDf = 1;
-};
-Filesys::DfPortable->import() if ($haveFilesysDf);
+my $haveFilesysDf;
 
 $VERSION  = "0.102";
 @colNames = qw(mountpoint blocks bfree bavail bused bper files ffree favail fused fper);
@@ -133,6 +127,17 @@ sub collect_data()
 {
     my $self = $_[0];
     my @data;
+
+    unless( defined($haveFilesysDf) )
+    {
+	$haveFilesysDf = 0;
+	eval {
+	    require Sys::Filesystem;
+	    require Filesys::DfPortable;
+	    $haveFilesysDf = 1;
+	};
+	Filesys::DfPortable->import() if ($haveFilesysDf);
+    }
 
     if ($haveFilesysDf)
     {
