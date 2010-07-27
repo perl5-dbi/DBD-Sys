@@ -23,7 +23,7 @@ DBD::Sys::Plugin::Any::Procs - provides a table containing running processes
 
 =cut
 
-$VERSION = "0.101";
+$VERSION = "0.102";
 @colNames =
   qw(uid gid euid egid pid ppid pgrp sess priority ttynum flags fulltime ctime virtsize rss wchan fname start pctcpu state pctmem cmndline ttydev);
 

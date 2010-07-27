@@ -6,7 +6,7 @@ use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
-$VERSION  = "0.101";
+$VERSION  = "0.102";
 @colNames = qw(pid ppid uid sess cmndline start fulltime virtsize fname state threads);
 
 =pod

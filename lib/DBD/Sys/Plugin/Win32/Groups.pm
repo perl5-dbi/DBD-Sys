@@ -11,7 +11,7 @@ eval {
     $haveWin32pwent = 1;
 };
 
-$VERSION  = "0.101";
+$VERSION  = "0.102";
 @colNames = qw(groupname grpass gid members);
 
 =pod

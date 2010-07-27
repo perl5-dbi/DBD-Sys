@@ -30,7 +30,7 @@ eval {
     $haveSysFs = 1;
 };
 
-$VERSION  = "0.101";
+$VERSION  = "0.102";
 @colNames = qw(mountpoint mounted label volume device special type options);
 
 =head1 DESCRIPTION

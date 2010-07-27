@@ -6,7 +6,7 @@ use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
-$VERSION  = "0.101";
+$VERSION  = "0.102";
 @colNames = qw(username passwd uid gid quota comment gcos dir shell expire);
 
 =pod
