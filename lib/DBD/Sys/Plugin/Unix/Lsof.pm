@@ -93,7 +93,7 @@ Returns the column names of the table as named in L</Columns>
 
 sub get_col_names() { @colNames }
 
-=head2 getAttributes
+=head2 get_attributes
 
 Return the attributes supported by this module:
 
@@ -119,7 +119,7 @@ parameter).
 
 =cut
 
-sub getAttributes() { return qw(uids pids filesys) }
+sub get_attributes() { return qw(uids pids filesys) }
 
 my $havelsof            = 0;
 my $havesysfsmountpoint = 0;

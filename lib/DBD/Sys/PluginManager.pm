@@ -94,8 +94,8 @@ sub new
 
             foreach my $pluginClass (@pluginClasses)
             {
-                $pluginClass->can('getAttributes')
-                  and push( @tableAttrs, map { join( '_', 'sys', $pte, $_ ) } $pluginClass->getAttributes() );
+                $pluginClass->can('get_attributes')
+                  and push( @tableAttrs, map { join( '_', 'sys', $pte, $_ ) } $pluginClass->get_attributes() );
             }
         }
     }

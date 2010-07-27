@@ -106,7 +106,7 @@ Returns the column names of the table as named in L</Columns>
 
 sub get_col_names() { return @colNames }
 
-=head2 getAttributes
+=head2 get_attributes
 
 Return the attributes supported by this module:
 
@@ -119,7 +119,7 @@ This defaults to 1.
 
 =cut
 
-sub getAttributes() { return qw(blocksize) }
+sub get_attributes() { return qw(blocksize) }
 
 =head2 collect_data
 
