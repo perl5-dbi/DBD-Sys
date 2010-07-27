@@ -109,7 +109,8 @@ sub collect_data()
         while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) =
                 Win32::pwent::getpwent() )
         {
-            push( @data, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
+            push( @data,
+                  [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
         }
         Win32::pwent::endpwent();
     }

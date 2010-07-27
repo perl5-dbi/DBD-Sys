@@ -26,7 +26,8 @@ $VERSION = "0.02";
 
 my $haveNetInterface;
 
-@colNames = qw(interface address_family address netmask broadcast hwaddress flags_bin flags mtu metric);
+@colNames =
+  qw(interface address_family address netmask broadcast hwaddress flags_bin flags mtu metric);
 
 =head1 DESCRIPTION
 
@@ -108,9 +109,9 @@ sub _getflags
 {
     my $flags = $_[0] || 0;
     my $txt = ( $flags & $flagconsts{up} ) ? '<up' : '<down';
-    foreach my $nm (keys %flagconsts)
+    foreach my $nm ( keys %flagconsts )
     {
-	$nm eq 'up' and next;
+        $nm eq 'up' and next;
         $flags & $flagconsts{$nm} and $txt .= ' ' . $nm;
     }
     $txt .= '>';
@@ -126,25 +127,25 @@ sub collect_data()
 {
     my @data;
 
-    unless( defined($haveNetInterface) )
+    unless ( defined($haveNetInterface) )
     {
-	$haveNetInterface = 0;
-	eval {
-	    require Net::Interface;
-	    require Socket6;
-	    $haveNetInterface = 1;
-	};
+        $haveNetInterface = 0;
+        eval {
+            require Net::Interface;
+            require Socket6;
+            $haveNetInterface = 1;
+        };
 
-	if( $haveNetInterface )
-	{
-	    foreach my $iffname ( sort @{ $Net::Interface::EXPORT_TAGS{iffs} } )
-	    {
-		my $iffn = Net::Interface->can($iffname);
-		my $val = &{$iffn}() + 0;
-		my $nm = &{$iffn}();
-		$flagconsts{$nm} = $val;
-	    }
-	}
+        if ($haveNetInterface)
+        {
+            foreach my $iffname ( sort @{ $Net::Interface::EXPORT_TAGS{iffs} } )
+            {
+                my $iffn = Net::Interface->can($iffname);
+                my $val  = &{$iffn}() + 0;
+                my $nm   = &{$iffn}();
+                $flagconsts{$nm} = $val;
+            }
+        }
     }
 
     if ($haveNetInterface)
@@ -156,20 +157,28 @@ sub collect_data()
         {
             my $if    = $hvp->info();
             my $flags = _getflags( $if->{flags} );
-            unless ( defined $if->{flags} && $if->{flags} & Net::Interface::IFF_UP() )    # no flags found
+            unless ( defined $if->{flags}
+                     && $if->{flags} & Net::Interface::IFF_UP() )    # no flags found
             {
-                push( @data, [ $if->{name}, undef, undef, undef, undef, undef, $if->{flags}, $flags, undef, undef, ] );
+                push(
+                      @data,
+                      [
+                         $if->{name},  undef,  undef, undef, undef, undef,
+                         $if->{flags}, $flags, undef, undef,
+                      ]
+                    );
             }
-            else                                                                          # flags found
+            else                                                     # flags found
             {
-                my $mac    = ( defined $if->{mac} )    ? Net::Interface::mac_bin2hex( $if->{mac} ) : undef;
-                my $mtu    = $if->{mtu}                ? $if->{mtu}                                     : undef;
-                my $metric = ( defined $if->{metric} ) ? $if->{metric}                               : undef;
+                my $mac =
+                  ( defined $if->{mac} ) ? Net::Interface::mac_bin2hex( $if->{mac} ) : undef;
+                my $mtu = $if->{mtu} ? $if->{mtu} : undef;
+                my $metric = ( defined $if->{metric} ) ? $if->{metric} : undef;
 
                 foreach my $afname ( sort @{ $Net::Interface::EXPORT_TAGS{afs} } )
                 {
-		    my $affn = Net::Interface->can($afname);
-		    my $af = $affn ? &{$affn}() + 0 : undef;
+                    my $affn = Net::Interface->can($afname);
+                    my $af = $affn ? &{$affn}() + 0 : undef;
 
                     next unless ( defined($af) );
 
@@ -183,13 +192,15 @@ sub collect_data()
                         {
                             my $addr_str  = Socket6::inet_ntop( $af, $address[$i] );
                             my $netm_str  = Socket6::inet_ntop( $af, $netmask[$i] );
-                            my $broad_str = Socket6::inet_ntop( $af, $broadcast[$i] ) if ( defined( $broadcast[$i] ) );
+                            my $broad_str = Socket6::inet_ntop( $af, $broadcast[$i] )
+                              if ( defined( $broadcast[$i] ) );
 
                             push(
                                   @data,
                                   [
-                                     $if->{name}, $afname,      $addr_str, $netm_str,  $broad_str,
-                                     $mac,        $if->{flags}, $flags,    $if->{mtu}, $if->{metric},
+                                     $if->{name}, $afname, $addr_str,    $netm_str,
+                                     $broad_str,  $mac,    $if->{flags}, $flags,
+                                     $if->{mtu},  $if->{metric},
                                   ]
                                 );
                         }

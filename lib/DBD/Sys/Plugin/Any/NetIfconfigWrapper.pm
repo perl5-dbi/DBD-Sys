@@ -113,22 +113,22 @@ sub collect_data()
 {
     my @data;
 
-    unless( defined( $haveNetIfconfigWrapper ) )
+    unless ( defined($haveNetIfconfigWrapper) )
     {
-	$haveNetIfconfigWrapper = 0;
-	eval {
-	    require Net::Ifconfig::Wrapper;
-	    $haveNetIfconfigWrapper = 1;
-	};
+        $haveNetIfconfigWrapper = 0;
+        eval {
+            require Net::Ifconfig::Wrapper;
+            $haveNetIfconfigWrapper = 1;
+        };
     }
 
-    unless( defined( $haveNetAddrIP ) )
+    unless ( defined($haveNetAddrIP) )
     {
-	$haveNetAddrIP = 0;
-	eval {
-	    require NetAddr::IP;
-	    $haveNetAddrIP = 1;
-	};
+        $haveNetAddrIP = 0;
+        eval {
+            require NetAddr::IP;
+            $haveNetAddrIP = 1;
+        };
     }
 
     if ($haveNetIfconfigWrapper)
@@ -141,19 +141,19 @@ sub collect_data()
             {
                 while ( my ( $addr, $netmask ) = each %{ $ifdata->{inet} } )
                 {
-		    my $bcast;
-		    if( $haveNetAddrIP )
-		    {
-			# XXX let's see what happens when Net::Ifconfig::Wrapper::Ifconfig delivers IPv6 addresses ...
-			my $ip = NetAddr::IP->new( $addr, $netmask ); 
-			$bcast = $ip->broadcast();
-		    }
+                    my $bcast;
+                    if ($haveNetAddrIP)
+                    {
+                        # XXX let's see what happens when Net::Ifconfig::Wrapper::Ifconfig delivers IPv6 addresses ...
+                        my $ip = NetAddr::IP->new( $addr, $netmask );
+                        $bcast = $ip->broadcast();
+                    }
 
                     push(
                           @data,
                           [
-                             $interface, 'inet', $addr, $netmask, $bcast, $ifdata->{ether}, $ifdata->{status},
-                             ( $ifdata->{status} ? '<up>' : '<down>' )
+                             $interface, 'inet', $addr, $netmask, $bcast, $ifdata->{ether},
+                             $ifdata->{status}, ( $ifdata->{status} ? '<up>' : '<down>' )
                           ]
                         );
                 }
@@ -163,8 +163,8 @@ sub collect_data()
                 push(
                       @data,
                       [
-                         $interface, undef, undef, undef, undef, $ifdata->{ether}, $ifdata->{status},
-                         ( $ifdata->{status} ? '<up>' : '<down>' )
+                         $interface, undef, undef, undef, undef, $ifdata->{ether},
+                         $ifdata->{status}, ( $ifdata->{status} ? '<up>' : '<down>' )
                       ]
                     );
             }

@@ -69,7 +69,7 @@ Returns 100 - the lowest priority used by DBD::Sys delivered tables.
 =cut
 
 sub get_col_names() { @colNames }
-sub get_priority   { return 100; }
+sub get_priority    { return 100; }
 
 =head2 collect_data
 
@@ -85,7 +85,8 @@ sub collect_data()
 
     while ( my ( $table, $class ) = each(%tables) )
     {
-        push( @data, [ undef, undef, $table, 'TABLE', _ARRAY($class) ? join(',', @$class) : $class ] );
+        push( @data,
+              [ undef, undef, $table, 'TABLE', _ARRAY($class) ? join( ',', @$class ) : $class ] );
     }
 
     return \@data;

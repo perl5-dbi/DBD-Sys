@@ -128,15 +128,15 @@ sub collect_data()
     my $self = $_[0];
     my @data;
 
-    unless( defined($haveFilesysDf) )
+    unless ( defined($haveFilesysDf) )
     {
-	$haveFilesysDf = 0;
-	eval {
-	    require Sys::Filesystem;
-	    require Filesys::DfPortable;
-	    $haveFilesysDf = 1;
-	};
-	Filesys::DfPortable->import() if ($haveFilesysDf);
+        $haveFilesysDf = 0;
+        eval {
+            require Sys::Filesystem;
+            require Filesys::DfPortable;
+            $haveFilesysDf = 1;
+        };
+        Filesys::DfPortable->import() if ($haveFilesysDf);
     }
 
     if ($haveFilesysDf)
@@ -153,8 +153,11 @@ sub collect_data()
             if ( defined($df) )
             {
                 @row = (
-                        $fs->mount_point($filesys),
-                        @$df{ 'blocks', 'bfree', 'bavail', 'bused', 'per', 'files', 'ffree', 'favail', 'fused', 'fper' }
+                         $fs->mount_point($filesys),
+                         @$df{
+                             'blocks', 'bfree',  'bavail', 'bused', 'per', 'files',
+                             'ffree',  'favail', 'fused',  'fper'
+                           }
                        );
             }
             else

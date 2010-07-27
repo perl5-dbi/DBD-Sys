@@ -183,7 +183,8 @@ sub get_sys_versions
 sub get_avail_tables
 {
     my ($dbh) = @_;
-    my @tables = ( $dbh->SUPER::get_avail_tables(), $dbh->selectrow_array("SELECT * FROM alltables"), );
+    my @tables =
+      ( $dbh->SUPER::get_avail_tables(), $dbh->selectrow_array("SELECT * FROM alltables"), );
     return @tables;
 }
 

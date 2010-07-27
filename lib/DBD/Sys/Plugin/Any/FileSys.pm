@@ -98,13 +98,13 @@ sub collect_data()
 {
     my @data;
 
-    unless( defined($haveSysFs) )
+    unless ( defined($haveSysFs) )
     {
-	$haveSysFs = 0;
-	eval {
-	    require Sys::Filesystem;
-	    $haveSysFs = 1;
-	};
+        $haveSysFs = 0;
+        eval {
+            require Sys::Filesystem;
+            $haveSysFs = 1;
+        };
     }
 
     if ($haveSysFs)

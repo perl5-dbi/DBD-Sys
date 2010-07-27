@@ -135,22 +135,22 @@ sub collect_data()
     my $self = $_[0];
     my @data;
 
-    unless( defined($havelsof) )
+    unless ( defined($havelsof) )
     {
-$havelsof            = 0;
-eval {
-    require Unix::Lsof;
-    $havelsof = 1;
-};
+        $havelsof = 0;
+        eval {
+            require Unix::Lsof;
+            $havelsof = 1;
+        };
     }
 
-    unless( defined($havesysfsmountpoint) )
+    unless ( defined($havesysfsmountpoint) )
     {
-$havesysfsmountpoint = 0;
-eval {
-    require Sys::Filesystem::MountPoint;
-    $havesysfsmountpoint = 1;
-};
+        $havesysfsmountpoint = 0;
+        eval {
+            require Sys::Filesystem::MountPoint;
+            $havesysfsmountpoint = 1;
+        };
     }
 
     if ($havelsof)
@@ -175,18 +175,27 @@ eval {
         if ( $self->{meta}->{filesys} )
         {
             push( @args,
-                  ref( $self->{meta}->{filesys} ) eq 'ARRAY' ? @{ $self->{meta}->{uids} } : $self->{meta}->{filesys} );
+                  ref( $self->{meta}->{filesys} ) eq 'ARRAY'
+                  ? @{ $self->{meta}->{uids} }
+                  : $self->{meta}->{filesys} );
         }
 
         my ( $output, $error ) = Unix::Lsof::lsof(@args);
         foreach my $pid ( keys %{$output} )
         {
-            my $pinfo = $output->{$pid};
-            my @pfields =
-              @$pinfo{ 'process id', 'parent pid', 'process group id', 'user id', 'login name', 'command name' };
+            my $pinfo   = $output->{$pid};
+            my @pfields = @$pinfo{
+                'process id',
+                'parent pid',
+                'process group id',
+                'user id',
+                'login name',
+                'command name'
+              };
             foreach my $pfile ( @{ $pinfo->{files} } )
             {
-                my @row = ( @pfields, @$pfile{ 'file name', 'file type', 'inode number', 'link count' } );
+                my @row =
+                  ( @pfields, @$pfile{ 'file name', 'file type', 'inode number', 'link count' } );
                 push( @row,
                       $havesysfsmountpoint
                       ? Sys::Filesystem::MountPoint::path_to_mount_point( $pfile->{'file name'} )

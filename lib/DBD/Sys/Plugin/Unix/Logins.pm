@@ -120,13 +120,13 @@ sub collect_data()
     my $self = $_[0];
     my @data;
 
-    unless( defined($haveSysUtmp) )
+    unless ( defined($haveSysUtmp) )
     {
-	$haveSysUtmp = 0;
-	eval {
-	    require Sys::Utmp;
-	    $haveSysUtmp = 1;
-	};
+        $haveSysUtmp = 0;
+        eval {
+            require Sys::Utmp;
+            $haveSysUtmp = 1;
+        };
     }
 
     if ($haveSysUtmp)

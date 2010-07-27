@@ -108,14 +108,14 @@ sub collect_data
     my $self = $_[0];
     my @data;
 
-    unless( defined($have_win32_process_info) )
+    unless ( defined($have_win32_process_info) )
     {
-	( $have_win32_process_info, $have_win32_process_commandline ) = ( 0, 0 );
-	eval { require Win32::Process::Info;        $have_win32_process_info        = 1; };
-	eval { require Win32::Process::CommandLine; $have_win32_process_commandline = 1; };
+        ( $have_win32_process_info, $have_win32_process_commandline ) = ( 0, 0 );
+        eval { require Win32::Process::Info;        $have_win32_process_info        = 1; };
+        eval { require Win32::Process::CommandLine; $have_win32_process_commandline = 1; };
 
-	Win32::Process::Info->import( 'NT', 'WMI' ) if ($have_win32_process_info);
-	Win32::Process::CommandLine->import() if ($have_win32_process_commandline);
+        Win32::Process::Info->import( 'NT', 'WMI' ) if ($have_win32_process_info);
+        Win32::Process::CommandLine->import() if ($have_win32_process_commandline);
     }
 
     if ($have_win32_process_info)
@@ -138,7 +138,10 @@ sub collect_data
                      $procInfo->{SessionId} || 0,
                      $cli || $procInfo->{Name} || "<dead>",
                      $procInfo->{CreationDate},
-                     int( ( $procInfo->{KernelModeTime} || 0 ) + ( $procInfo->{UserModeTime} || 0 ) + .499 ),
+                     int(
+                          ( $procInfo->{KernelModeTime} || 0 ) +
+                            ( $procInfo->{UserModeTime} || 0 ) + .499
+                        ),
                      $procInfo->{VirtualSize} || $procInfo->{WorkingSetSize},
                      $procInfo->{ExecutablePath},
                      $procInfo->{_status} || $procInfo->{Status} || $procInfo->{ExecutionState},

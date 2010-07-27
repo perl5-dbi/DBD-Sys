@@ -91,7 +91,8 @@ sub collect_data()
                          and ( $row->[2] == $gid )
                          and ( $row->[3] eq $members ) )
                 {
-                    warn "$name is delivered more than once and the group information differs from the first one";
+                    warn
+                      "$name is delivered more than once and the group information differs from the first one";
                 }
             }
             else

@@ -107,9 +107,11 @@ sub collect_data()
     if ($havepwent)
     {
         setpwent();    # rewind to ensure we're starting fresh ...
-        while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = getpwent() )
+        while ( my ( $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) =
+                getpwent() )
         {
-            push( @data, [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
+            push( @data,
+                  [ $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ] );
         }
         setpwent();
         endpwent();

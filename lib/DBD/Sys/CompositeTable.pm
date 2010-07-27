@@ -149,9 +149,11 @@ sub _pk_cmp_fail
     my ( $pk, $epk ) = @_;
     ref($pk) eq ref($epk)
       or return
-      sprintf( "Can't compare primary key type (%s) of '%s' with primary key type (%s) of '%s'",
-               ref($epk)      ? "\\" . ref($epk) : "SCALAR",
-               "%s", ref($pk) ? "\\" . ref($pk)  : "SCALAR", "%s" );
+      sprintf(
+               "Can't compare primary key type (%s) of '%s' with primary key type (%s) of '%s'",
+               ref($epk) ? "\\" . ref($epk) : "SCALAR", "%s",
+               ref($pk)  ? "\\" . ref($pk)  : "SCALAR", "%s"
+             );
     if ( ref($pk) eq "" )
     {
         $pk eq $epk and return;
@@ -175,7 +177,8 @@ sub new
     my ( $proto, $tableInfo, $attrs ) = @_;
 
     my @tableClasses =
-      sort { ( $a->get_priority() <=> $b->get_priority() ) || ( blessed($a) cmp blessed($b) ) } @$tableInfo;
+      sort { ( $a->get_priority() <=> $b->get_priority() ) || ( blessed($a) cmp blessed($b) ) }
+      @$tableInfo;
 
     my $compositeName = join( "-", @tableClasses );
     my ( @embed, %allColNames, @allColNames, $allColIdx, %mergeCols, %enhanceCols, $primaryKey );
@@ -269,7 +272,8 @@ sub collect_data
     my $meta          = $self->{meta};
     my $compositeName = $meta->{composite_name};
     my $rowOffset     = 0;
-    my @primaryKeys   = ( ref $meta->{primary_key} ) ? @{ $meta->{primary_key} } : ( $meta->{primary_key} );
+    my @primaryKeys =
+      ( ref $meta->{primary_key} ) ? @{ $meta->{primary_key} } : ( $meta->{primary_key} );
     foreach my $embedded ( @{ $meta->{embed} } )
     {
         my @pkIdx         = map { $embedded->column_num($_) } @primaryKeys;
@@ -286,7 +290,10 @@ sub collect_data
             {
                 if ( scalar( @{$ref} ) == $nextRowOffset )
                 {
-                    warn "primary key '" . $meta->{primary_key} . "' is not unique for " . blessed($embedded);
+                    warn "primary key '"
+                      . $meta->{primary_key}
+                      . "' is not unique for "
+                      . blessed($embedded);
                 }
                 else
                 {
