@@ -6,6 +6,8 @@ use warnings;
 use vars qw($VERSION @colNames);
 use base qw(DBD::Sys::Table);
 
+use Params::Util qw(_ARRAY);
+
 =pod
 
 =head1 NAME
@@ -83,7 +85,7 @@ sub collectData()
 
     while ( my ( $table, $class ) = each(%tables) )
     {
-        push( @data, [ undef, undef, $table, 'TABLE', $class ] );
+        push( @data, [ undef, undef, $table, 'TABLE', _ARRAY($class) ? join(',', @$class) : $class ] );
     }
 
     return \@data;
