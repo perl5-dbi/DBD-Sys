@@ -45,6 +45,17 @@ under the C<DBD::Sys::Plugin> namespace:
       inner       => 0,
       only        => qr/^DBD::Sys::Plugin::\p{Word}+$/;
 
+Each plugin is expected to control some table implementations. The plugin
+manager forces each plugin to load the tables during the initialization
+phase and request the table's meta data from the implementor classes. The
+required meta data are at least the name of the implemented table and the
+supported database handle attributes of the implementor. These information
+are required for properly attribute handling in the database driver and
+to support multiple implementors for one table (see
+L<DBD::Sys::Plugin::Any::NetInterface> and
+L<DBD::Sys::Plugin::Any::NetIfconfigWrapper>, both provide an
+implementation of the table C<netint>).
+
 =head1 METHODS
 
 =head2 new

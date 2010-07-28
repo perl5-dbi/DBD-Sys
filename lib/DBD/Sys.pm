@@ -248,39 +248,50 @@ DBD::Sys - System tables interface via DBI
 
   use DBI;
   my $dbh = DBI->connect('DBI::Sys:');
-  my $st  = $dbh->prepare('select distinct * from filesystems join filesysdf on mountpoint');
-  my $num = $st->execute();
-  if( $num > 0 )
-  {
-      while( my $row = $st->fetchrow_hashref() )
-      {
-          # ...
-      }
-  }
+  my @tables = $dbh->selectall_hashref(
+      'select * from alltables',
+      'table_name');
+  my @filesystems = $dbh->selectall_hashref(
+      'select distinct * from filesystems join filesysdf using(mountpoint)',
+      'mountpoint');
 
 =head1 DESCRIPTION
 
 DBD::Sys is a so called database driver for L<DBI> designed to request
 information from system tables using SQL. It's based on L<SQL::Statement> as
-SQL engine and allows to be extended by L<DBD::Sys::Plugins>.
+SQL engine and allows to be extended by L<DBD::Sys::Plugin>s.
 
 =head2 Prerequisites
 
 Of course, a DBD requires L<DBI> to run. Further, L<SQL::Statement> as SQL
 engine is required, L<Module::Pluggable> to manage the plugin's and
-L<Module::Build> for installation. Finally, to speed up some checks,
-L<Params::Util> is needed.
+L<Module::Build> for installation. To speed up some checks, L<Params::Util>
+is used. Finally, on the MSWin32 platform, L<Win32::pwent> is required
+for the user and group lists.
 
 All these modules are mandatory and DBD::Sys will fail when they are not
 available.
 
 To request system information, existing modules from CPAN are used - there
-are available ones to provide access to some system tables. These modules are
-optional, but recommended. It wouldn't make much sense to use DBD::Sys without
-the ability to access the tables from the (operating) system.
+are available ones to provide access to some system tables. These modules
+are optional, but recommended. It wouldn't make much sense to use DBD::Sys
+without the ability to access the tables from the (operating) system. All
+those optional modules are loaded when the table which use it is access
+the first time.
 
 To get an overview which dependencies are there, please check the plugins
 or take a look into META.yml.
+
+=head2 Plugins
+
+DBD::Sys allows accessing operating system data easily using SQL using
+plugins. The plugins are organized in a two level hierarchy, the first
+level is used to group the plugins (for easier overview for users) and
+the second level contains the table implementors.
+
+Please consult the documentation of L<DBD::Sys::PluginManager> to get
+a more detailed insight and do not forget to read L<BUGS & LIMITATIONS>
+to learn about the drawback of the plugin structure.
 
 =head1 USAGE
 
@@ -326,6 +337,31 @@ reported by throwing an exception using L<Carp|Carp::croak>.
 
 =head2 Metadata
 
+In addition to the L<DBI> and L<DBI::DBD::SqlEngine> attributes, you can
+use the following dbh attributes:
+
+=over 4
+
+=item sys_pluginmgr
+
+This attribute contains the DBD::Sys plugin-manager. It is read-only,
+but can be accessed to request some information from the plugin-manager
+directly.
+
+=item sys_pluginmgr_class
+
+This attribute contains the class of the DBD::Sys plugin-manager. It
+defaults to C<DBD::Sys::PluginManager>.
+
+If it's reassigned, the currently active plugin-manager is replaced by
+a new instance if the given class. Once set attributes of tables are
+saved (if the tables still exists via the new plugin-manager).
+
+If you want to modify the behavior of the plugin-manager, you can assign
+an own implementation here.
+
+=back
+
 Each table implementor can request configurable meta data attributes.
 They will be accessible via the database handle:
 
@@ -340,11 +376,11 @@ to prevent inconsistent data.
 
 The design of the plugins makes it less predictable what columns are
 provided in the end. Well, at least those columns from the tables
-provided by the DBD::Sys::Plugin::Meta and DBD::Sys::Plugin::Any
-will be available, even if they are not filled with data when the
-appropriate module is missing (e.g. if L<Sys::Filesystem> is not
-available, the table C<filesystems> gets the columns provided by
-L<DBD::Sys::Plugin::Any::Filesys>, but no data at all).
+provided by the defaultly deployed tables will be available, even if
+they are not filled with data when the appropriate data source module
+is missing (e.g. if L<Sys::Filesystem> is not available, the table
+C<filesystems> gets the columns provided by
+L<DBD::Sys::Plugin::Any::FileSys>, but no data at all).
 
 All additional table implementors must use the same primary key as
 all other implementors. To stay at the example of C<filesystems>, the
