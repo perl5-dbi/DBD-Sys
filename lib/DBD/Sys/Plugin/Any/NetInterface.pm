@@ -16,7 +16,10 @@ DBD::Sys::Plugin::Any::NetInterface - provides a table containing the known netw
 
   $netifs = $dbh->selectall_hashref("select * from netint", "interface");
 
-$VERSION = "0.02";
+=cut
+
+$VERSION = "0.103";
+
 =head1 ISA
 
   DBD::Sys::Plugin::Any::NetInterface

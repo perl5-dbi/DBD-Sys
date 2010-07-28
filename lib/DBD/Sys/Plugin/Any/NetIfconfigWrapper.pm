@@ -15,8 +15,10 @@ DBD::Sys::Plugin::Any::NetIfconfigWrapper - provides a table containing the know
 =head1 SYNOPSIS
 
   $netifs = $dbh->selectall_hashref("select * from netint", "interface");
+=cut
 
-$VERSION = "0.02";
+$VERSION = "0.103";
+
 =head1 ISA
 
   DBD::Sys::Plugin::Any::NetIfconfigWrapper

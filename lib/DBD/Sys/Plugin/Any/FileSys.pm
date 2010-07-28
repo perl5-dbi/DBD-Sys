@@ -26,7 +26,7 @@ DBD::Sys::Plugin::Any::FileSys - provides a table containing file systems
 
 my $haveSysFs;
 
-$VERSION  = "0.102";
+$VERSION  = "0.103";
 @colNames = qw(mountpoint mounted label volume device special type options);
 
 =head1 DESCRIPTION

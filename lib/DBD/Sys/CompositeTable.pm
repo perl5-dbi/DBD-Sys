@@ -11,7 +11,7 @@ use Clone qw(clone);
 use Carp qw(croak);
 
 @ISA     = qw(DBD::Sys::Table);
-$VERSION = "0.102";
+$VERSION = "0.103";
 
 =pod
 

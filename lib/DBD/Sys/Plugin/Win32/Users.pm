@@ -12,7 +12,7 @@ eval {
     $haveWin32pwent = 1;
 };
 
-$VERSION  = "0.102";
+$VERSION  = "0.103";
 @colNames = qw(username passwd uid gid quota comment gcos dir shell expire);
 
 =pod

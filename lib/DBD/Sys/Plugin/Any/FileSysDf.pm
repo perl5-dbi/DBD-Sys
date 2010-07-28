@@ -26,7 +26,7 @@ DBD::Sys::Plugin::Any::FileSysDf - provides a table containing the free space of
 
 my $haveFilesysDf;
 
-$VERSION  = "0.102";
+$VERSION  = "0.103";
 @colNames = qw(mountpoint blocks bfree bavail bused bper files ffree favail fused fper);
 
 =head1 DESCRIPTION

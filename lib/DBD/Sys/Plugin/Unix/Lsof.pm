@@ -6,7 +6,7 @@ use vars qw($VERSION @colNames);
 
 use base qw(DBD::Sys::Table);
 
-$VERSION  = "0.102";
+$VERSION  = "0.103";
 @colNames = qw(pid ppid pgrp uid username command filename filetype inode linkcount mountpoint);
 
 =pod

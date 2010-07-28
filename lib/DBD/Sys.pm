@@ -6,7 +6,7 @@ use strict;
 use vars qw(@ISA $VERSION $drh);
 use base qw(DBI::DBD::SqlEngine);
 
-$VERSION = "0.102";
+$VERSION = "0.103";
 
 $drh = undef;    # holds driver handle(s) once initialised
 

@@ -6,7 +6,7 @@ use warnings;
 use vars qw($VERSION);
 use base qw(DBD::Sys::Plugin);
 
-$VERSION = 0.100;
+$VERSION = "0.103";
 
 =head1 NAME
 

@@ -3,7 +3,7 @@ package Bundle::DBD::Sys;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '0.102';
+$VERSION = '0.103';
 
 1;
 
